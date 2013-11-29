@@ -36,10 +36,11 @@ class Storage:
     Request functions and result objects are stored as binary
     blobs in the database, so any bytes object will be fine.
     They'll be returned as they were sent.
+
     """
 
     def __init__(self, dbfile="./sheepdog.sqlite"):
-        """Creates the database structure if it doesn't already exist.
+        """__init__ creates the database structure if it doesn't already exist.
 
         dbfile is a file path for the sqlite file, or `:memory:` to only
         use in memory persistence.

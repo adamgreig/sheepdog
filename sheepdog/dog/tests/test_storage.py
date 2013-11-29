@@ -5,7 +5,6 @@ Copyright 2013 Adam Greig
 Storage tests.
 """
 
-import tempfile
 from nose.tools import assert_equals
 
 from sheepdog.dog import storage
