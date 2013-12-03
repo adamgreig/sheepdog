@@ -11,7 +11,7 @@ are text files everywhere and you feel an overwhelming sense of mediocracy.
 
 Sheepdog aims to make life better for a somewhat specific use case:
 
-1. You're using Python. Hopefully even Python 3.3. You're using numpy.
+1. You're using Python. Hopefully even Python 3.3.
 
 2. You've got access to a Grid Engine cluster on some remote machine.  It can
    also run Python, somehow or other.  The cluster computers and your client
