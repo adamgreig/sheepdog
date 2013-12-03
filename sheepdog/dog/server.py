@@ -40,7 +40,7 @@ def get_storage():
 
 def run_server(port=None, dbfile=None):
     app.config['DBFILE'] = dbfile
-    app.run(port=port)
+    app.run(host='0.0.0.0', port=port)
 
 
 class Server:
