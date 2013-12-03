@@ -66,6 +66,8 @@ class Storage:
         args_list is a list, tuple or other iterable where each item is
         some bytes object that should be given to workers to run their
         target function with. Probably a marshalled tuple or similar.
+
+        Returns the new request ID.
         """
         c = self.conn.cursor()
         c.execute("INSERT INTO requests (function, date_submitted)"
@@ -78,6 +80,8 @@ class Storage:
                       " VALUES (?, ?, ?)", tasks_list)
         self.conn.commit()
         c.close()
+
+        return request_id
 
     def get_details(self, request_id, job_index):
         """Get the target function and arguments for a given job index.
@@ -107,6 +111,16 @@ class Storage:
                   (task_id[0], result))
         self.conn.commit()
         c.close()
+
+    def count_results(self, request_id):
+        """Count the number of results so far for the given request_id.
+        """
+        c = self.conn.cursor()
+        c.execute("SELECT COUNT(*)"
+                  " FROM results"
+                  " JOIN tasks ON results.task_id=tasks.id"
+                  " WHERE tasks.request_id=?", (request_id,))
+        return c.fetchone()[0]
 
     def get_results(self, request_id):
         """Fetch all results for a given request_id.

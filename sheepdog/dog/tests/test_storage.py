@@ -29,16 +29,17 @@ class TestStorage:
     def add_request(self):
         f = b"i'm a function!"
         args = [b"abc", b"def", b"geh"]
-        self.storage.new_request(f, args)
+        reqid = self.storage.new_request(f, args)
 
-        return f, args
+        return f, args, reqid
 
     def test_adds_request(self):
-        f, args = self.add_request()
+        f, args, reqid = self.add_request()
 
         self.c.execute("SELECT * FROM requests")
         request = self.c.fetchone()
         assert_equals(request[1], f)
+        assert_equals(reqid, request[0])
 
         self.c.execute("SELECT request_id, job_index, args FROM tasks")
         tasks = self.c.fetchall()
@@ -48,22 +49,20 @@ class TestStorage:
         assert_equals(tasks[2], (request[0], 3, args[2]))
 
     def test_gets_details(self):
-        f, args = self.add_request()
+        f, args, reqid = self.add_request()
         
-        request_id = self.c.execute("SELECT MAX(id) FROM requests").fetchone()
-        details = self.storage.get_details(request_id[0], 2)
+        details = self.storage.get_details(reqid, 2)
         assert_equals(details, (f, args[1]))
 
-    def store_results(self):
+    def store_results(self, request_id):
         results = [b"ABC", b"DEF", b"GEH"]
-        request_id = self.c.execute("SELECT MAX(id) FROM requests").fetchone()
         for idx, result in enumerate(results):
-            self.storage.store_result(request_id[0], idx+1, result)
+            self.storage.store_result(request_id, idx+1, result)
         return results
 
     def test_stores_results(self):
-        f, args = self.add_request()
-        results = self.store_results()
+        f, args, request_id = self.add_request()
+        results = self.store_results(request_id)
 
         r = self.c.execute("SELECT task_id, result FROM results").fetchall()
         assert_equals(r[0][1], results[0])
@@ -76,10 +75,15 @@ class TestStorage:
         assert_equals(r[1], 2)
 
     def test_gets_results(self):
-        f, args = self.add_request()
-        results = self.store_results()
+        f, args, request_id = self.add_request()
+        results = self.store_results(request_id)
         
-        request_id = self.c.execute("SELECT MAX(id) FROM requests").fetchone()
-        r = self.storage.get_results(request_id[0])
+        r = self.storage.get_results(request_id)
 
         assert_equals(r, list(zip(args, results)))
+
+    def test_counts_results(self):
+        f, args, request_id = self.add_request()
+        results = self.store_results(request_id)
+
+        assert_equals(self.storage.count_results(request_id), len(results))
