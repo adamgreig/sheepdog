@@ -12,6 +12,7 @@ from sheepdog.dog import storage
 class TestStorage:
     def setup(self):
         self.storage = storage.Storage(dbfile=":memory:")
+        self.storage.initdb()
         self.db = self.storage.conn
         self.c = self.db.cursor()
 

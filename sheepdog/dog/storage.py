@@ -40,13 +40,17 @@ class Storage:
     """
 
     def __init__(self, dbfile="./sheepdog.sqlite"):
-        """__init__ creates the database structure if it doesn't already exist.
+        """__init__ creates a database connection.
 
         dbfile is a file path for the sqlite file, or `:memory:` to only
         use in memory persistence.
         """
         self.dbfile = dbfile
         self.conn = sqlite3.connect(dbfile)
+
+    def initdb(self):
+        """Create the database structure if it doesn't already exist.
+        """
         c = self.conn.cursor()
         c.executescript(schema)
         self.conn.commit()
