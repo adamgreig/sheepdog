@@ -21,14 +21,14 @@ def deploy_and_run(host, jobfile, request_id, user=None, port=22):
 
     hoststr = "{0}@{1}:{2}".format(user, host, port)
     filestr = "{0}:~/sheepdog_{1}.py".format(hoststr, request_id)
-    cmdstr = "qsub ~/sheepdog_{1}.py".format(request_id)
+    cmdstr = "qsub ~/sheepdog_{0}.py".format(request_id)
 
     fd, fp = tempfile.mkstemp()
-    fd.write(jobfile)
+    os.write(fd, jobfile)
 
     rv = subprocess.call(["scp", fp, filestr])
 
-    fd.close()
+    os.close(fd)
     os.unlink(fp)
 
     if rv:
