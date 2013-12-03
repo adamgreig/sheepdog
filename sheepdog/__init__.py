@@ -67,4 +67,4 @@ def map_sync(f, args, config):
         sys.stdout.flush()
         time.sleep(1)
 
-    return [r[1] for r in storage.get_results(request_id)]
+    return [marshal.loads(r[1]) for r in storage.get_results(request_id)]
