@@ -47,4 +47,23 @@ This is very similar to:
 
 ## Usage
 
-Coming Soon
+Ensure the GridEngine workers have Python available (you can specify where
+the interpreter is) and that it has the requests module installed.
+
+Then,
+
+```python
+    import sheepdog
+
+    def f(a, b):
+        return a + b
+
+    args = [(1, 1), (1, 2), (2, 2)]
+    config = {"host": "fear"}
+
+    results = sheepdog.map_sync(f, args, config)
+    print("\nReceived results:\n", results)
+```
+
+For further documentation see the docstrings, especially on
+`sheepdog.map_sync`.
