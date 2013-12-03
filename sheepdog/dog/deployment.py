@@ -24,7 +24,7 @@ def deploy_and_run(host, jobfile, request_id, user=None, port=22):
     cmdstr = "qsub ~/sheepdog_{0}.py".format(request_id)
 
     fd, fp = tempfile.mkstemp()
-    os.write(fd, jobfile)
+    os.write(fd, jobfile.encode())
 
     rv = subprocess.call(["scp", fp, filestr])
 
