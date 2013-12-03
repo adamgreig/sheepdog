@@ -27,10 +27,11 @@ Client("{url}", {request_id}, {job_index}).go()
 
 default_shebang = "/usr/bin/env python3"
 
-def job_file(url, request_id, job_index, grid_engine_opts=None,
+def job_file(url, request_id, job_index, n_args, grid_engine_opts=None,
              shebang=default_shebang):
     if grid_engine_opts is None:
         grid_engine_opts = []
+    grid_engine_opts.append("-t 1-{0}".format(n_args))
     geopts = '\n'.join("#$ {0}".format(opt) for opt in grid_engine_opts)
     client_code = inspect.getsource(client)
     return template.format(**locals())
