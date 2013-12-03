@@ -5,6 +5,7 @@ Copyright 2013 Adam Greig
 Clientside code.
 """
 
+import time
 import json
 import types
 import base64
@@ -33,6 +34,7 @@ class Client:
                 break
             except (requests.ConnectionError, requests.Timeout):
                 tries += 1
+                time.sleep(1)
                 continue
         if tries == self.HTTP_RETRIES:
             raise RuntimeError("Could not connect to server.")
@@ -64,6 +66,7 @@ class Client:
                 break
             except (requests.ConnectionError, requests.Timeout):
                 tries += 1
+                time.sleep(1)
                 continue
         if tries == self.HTTP_RETRIES:
             raise RuntimeError("Could not submit results to server.")
