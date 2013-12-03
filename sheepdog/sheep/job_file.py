@@ -8,7 +8,7 @@ Job file generation code.
 import inspect
 from sheepdog.sheep import client
 
-template = """#!{shebang}
+template = """#!{shell}
 {geopts}
 
 # Sheepdog Job File
@@ -22,16 +22,18 @@ template = """#!{shebang}
 ##
 ###########################################################
 
-Client("{url}", {request_id}, {job_index}).go()
+import os
+job_index = os.environ['SGE_TASK_ID']
+Client("{url}", {request_id}, job_index).go()
 """
 
-default_shebang = "/usr/bin/env python3"
-
-def job_file(url, request_id, job_index, n_args, grid_engine_opts=None,
-             shebang=default_shebang):
+def job_file(url, request_id, n_args, grid_engine_opts=None, shell=None):
     if grid_engine_opts is None:
-        grid_engine_opts = []
+        grid_engine_opts = ["-r y", "-l ubuntu=1", "-l lr=0"]
+    if shell is None:
+        shell = "/usr/bin/env python3"
     grid_engine_opts.append("-t 1-{0}".format(n_args))
+    grid_engine_opts.append("-S {0}".format(shell))
     geopts = '\n'.join("#$ {0}".format(opt) for opt in grid_engine_opts)
     client_code = inspect.getsource(client)
     return template.format(**locals())
