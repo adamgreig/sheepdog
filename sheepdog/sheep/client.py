@@ -67,3 +67,11 @@ class Client:
                 continue
         if tries == self.HTTP_RETRIES:
             raise RuntimeError("Could not submit results to server.")
+
+    def go(self):
+        """Call get_details(), run(), submit_results().
+           Just for convenience.
+        """
+        self.get_details()
+        self.run()
+        self.submit_results()
