@@ -5,10 +5,10 @@ Copyright 2013 Adam Greig
 HTTP server code.
 """
 
-from json import dumps
-from flask import Flask, request, g
-from base64 import b64encode, b64decode
+import json
+import base64
 from multiprocessing import Process
+from flask import Flask, request, g
 from sheepdog.dog.storage import Storage
 
 app = Flask(__name__)
@@ -19,17 +19,16 @@ def get_config():
     request_id = int(request.args['request_id'])
     job_index = int(request.args['job_index'])
     details = storage.get_details(request_id, job_index)
-    func = b64encode(details[0]).decode()
-    args = b64encode(details[1]).decode()
-    return dumps({"func": func, "args": args})
+    func = base64.b64encode(details[0]).decode()
+    args = base64.b64encode(details[1]).decode()
+    return json.dumps({"func": func, "args": args})
 
 @app.route('/', methods=['POST'])
 def submit_result():
     storage = get_storage()
     request_id = int(request.form['request_id'])
     job_index = int(request.form['job_index'])
-    result = request.form['result']
-    result = b64decode(result)
+    result = base64.b64decode(request.form['result'])
     storage.store_result(request_id, job_index, result)
     return "OK"
 

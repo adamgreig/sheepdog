@@ -13,7 +13,6 @@ import requests
 import tempfile
 import base64
 from nose.tools import assert_equals
-from nose.plugins.skip import SkipTest
 
 from sheepdog.dog import server, storage
 
