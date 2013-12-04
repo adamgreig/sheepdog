@@ -11,6 +11,14 @@ from multiprocessing import Process
 from flask import Flask, request, g
 from sheepdog.dog.storage import Storage
 
+try:
+    from tornado.wsgi import WSGIContainer
+    from tornado.httpserver import HTTPServer
+    from tornado.ioloop import IOLoop
+    USE_TORNADO = True
+except ImportError:
+    USE_TORNADO = False
+
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
@@ -38,9 +46,14 @@ def get_storage():
         g._storage = Storage(dbfile) if dbfile else Storage()
     return g._storage
 
-def run_server(port=None, dbfile=None):
+def run_server(port=7676, dbfile=None):
     app.config['DBFILE'] = dbfile
-    app.run(host='0.0.0.0', port=port)
+    if USE_TORNADO:
+        http_server = HTTPServer(WSGIContainer(app))
+        http_server.listen(port)
+        IOLoop.instance().start()
+    else:
+        app.run(host='0.0.0.0', port=port)
 
 
 class Server:
