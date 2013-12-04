@@ -72,5 +72,6 @@ Then,
     # [2, 3, 4]
 ```
 
-For further documentation see the docstrings, especially on
-`sheepdog.map_sync`.
+## Documentation
+
+For docs, see http://sheepdog.readthedocs.org/
