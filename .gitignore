@@ -1,5 +1,6 @@
 venv/
 dist/
+Sheepdog.egg-info
 MANIFEST
 __pycache__
 sheepdog.sqlite
