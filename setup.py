@@ -1,4 +1,7 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 try:
     import pypandoc
@@ -16,6 +19,8 @@ setup(
     license='MIT',
     description='Shepherd GridEngine',
     long_description=long_description,
+    test_suite='nose.collector',
+    tests_require=['nose', 'requests'],
     install_requires=[
         "Flask >= 0.10.1",
     ],
