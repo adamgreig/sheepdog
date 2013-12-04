@@ -1,6 +1,7 @@
 # Sheepdog
 
 [![Build Status](https://travis-ci.org/adamgreig/sheepdog.png?branch=master)](https://travis-ci.org/adamgreig/sheepdog)
+[![Coverage Status](https://coveralls.io/repos/adamgreig/sheepdog/badge.png?branch=master)](https://coveralls.io/r/adamgreig/sheepdog?branch=master)
 
 Make Grid Engine a bit more useful from Python.
 
