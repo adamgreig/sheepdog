@@ -56,20 +56,25 @@ class Client:
         if not hasattr(self, 'result'):
             raise RuntimeError("Must call `run` before `submit_results`.")
         result = base64.b64encode(marshal.dumps(self.result))
+        self._submit(self.url, dict(result=result))
+
+    def _submit_error(self, error):
+        self._submit(self.url + "/error", dict(error=str(error)))
+
+    def _submit(self, url, data):
+        data.update(
+            {"request_id": self.request_id, "job_index": self.job_index})
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                r = requests.post(self.url,
-                                  data=dict(request_id=self.request_id,
-                                            job_index=self.job_index,
-                                            result = result))
+                r = requests.post(url, data=data)
                 break
             except (requests.ConnectionError, requests.Timeout):
                 tries += 1
                 time.sleep(1)
                 continue
         if tries == self.HTTP_RETRIES:
-            raise RuntimeError("Could not submit results to server.")
+            raise RuntimeError("Could not submit to server.")
 
     def go(self):
         """Call get_details(), run(), submit_results().

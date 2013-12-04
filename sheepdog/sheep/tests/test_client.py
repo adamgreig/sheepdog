@@ -76,3 +76,10 @@ class TestClient:
         self.client.submit_results()
         assert_equal(self.storage.get_results(self.request_id),
             [(self.args_bin[1], marshal.dumps(self.func(*self.args)))])
+
+    def test_submits_errors(self):
+        self.client.get_details()
+        self.client.run()
+        self.client._submit_error("oops")
+        assert_equal(self.storage.get_errors(self.request_id),
+            [(self.args_bin[1], "oops")])
