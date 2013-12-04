@@ -9,7 +9,7 @@ import os
 import socket
 import marshal
 import tempfile
-from nose.tools import assert_equal, assert_raises
+from nose.tools import assert_equal, assert_raises, assert_true
 
 from sheepdog.dog import storage, server
 from sheepdog.sheep import client
@@ -53,8 +53,8 @@ class TestClient:
 
     def test_gets_details(self):
         self.client.get_details()
-        assert self.client.args == (3, 4)
-        assert type(self.client.func) == type(my_function)
+        assert_equal(self.client.args, (3, 4))
+        assert_equal(type(self.client.func), type(my_function))
 
     def test_doesnt_run_without_details(self):
         assert_raises(RuntimeError, self.client.run)
@@ -62,8 +62,8 @@ class TestClient:
     def test_runs_function(self):
         self.client.get_details()
         self.client.run()
-        assert hasattr(self.client, 'result')
-        assert self.client.result == self.func(*self.args)
+        assert_true(hasattr(self.client, 'result'))
+        assert_equal(self.client.result, self.func(*self.args))
 
     def test_doesnt_submit_without_running(self):
         assert_raises(RuntimeError, self.client.submit_results)
@@ -83,3 +83,20 @@ class TestClient:
         self.client._submit_error("oops")
         assert_equal(self.storage.get_errors(self.request_id),
             [(self.args_bin[1], "oops")])
+
+    def test_catches_exceptions(self):
+        def bad_function(a, b):
+            def inner(x):
+                class MyOwnException(ValueError):
+                    pass
+                raise MyOwnException("oopsie!")
+            inner(0)
+        func_bin = marshal.dumps(bad_function.__code__)
+        request_id = self.storage.new_request(func_bin, self.args_bin)
+        self.client = client.Client(self.url, request_id, self.job_index)
+
+        self.client.get_details()
+        self.client.run()
+
+        assert_true("sheepdog.sheep.client.MyOwnException: oopsie!" in
+                    self.storage.get_errors(request_id)[0][1])

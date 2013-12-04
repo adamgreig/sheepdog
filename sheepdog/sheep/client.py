@@ -11,6 +11,7 @@ import types
 import base64
 import marshal
 import requests
+import traceback
 
 class Client:
     """Find out what to do, do it, report back."""
@@ -50,7 +51,10 @@ class Client:
         """Run the downloaded function, storing the result."""
         if not hasattr(self, 'func') or not hasattr(self, 'args'):
             raise RuntimeError("Must call `get_details` before `run`.")
-        self.result = self.func(*self.args)
+        try:
+            self.result = self.func(*self.args)
+        except:
+            self._submit_error(traceback.format_exc())
 
     def submit_results(self):
         if not hasattr(self, 'result'):
