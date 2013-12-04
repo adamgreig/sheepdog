@@ -63,6 +63,8 @@ Then,
 
     results = sheepdog.map_sync(f, args, config)
     print("\nReceived results:\n", results)
+    # Received results:
+    # [2, 3, 4]
 ```
 
 For further documentation see the docstrings, especially on
