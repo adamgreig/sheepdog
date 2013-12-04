@@ -15,6 +15,7 @@ Contents:
 
    quickstart
    configuration
+   changelog
    code/modules
 
 
