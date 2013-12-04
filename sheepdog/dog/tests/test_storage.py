@@ -60,6 +60,16 @@ class TestStorage:
             self.storage.store_result(request_id, idx+1, result)
         return results
 
+    def store_results_and_errors(self, request_id):
+        results = [b"ABC", b"DEF"]
+        errors = ["oops"]
+        for idx, result in enumerate(results):
+            self.storage.store_result(request_id, idx+1, result)
+        for eidx, error in enumerate(errors):
+            print("storing error {0} at {1}".format(error, idx+eidx+2))
+            self.storage.store_error(request_id, idx+eidx+2, error)
+        return results, errors
+
     def test_stores_results(self):
         f, args, request_id = self.add_request()
         results = self.store_results(request_id)
@@ -82,8 +92,37 @@ class TestStorage:
 
         assert_equals(r, list(zip(args, results)))
 
+    def test_stores_errors(self):
+        f, args, request_id = self.add_request()
+        results, errors = self.store_results_and_errors(request_id)
+        r = self.c.execute("SELECT task_id, error FROM errors").fetchall()
+        assert_equals(r[0][1], errors[0])
+
+    def test_gets_errors(self):
+        f, args, request_id = self.add_request()
+        results, errors = self.store_results_and_errors(request_id)
+        r = self.storage.get_errors(request_id)
+        assert_equals(r, list(zip(args[-1:], errors)))
+
     def test_counts_results(self):
         f, args, request_id = self.add_request()
         results = self.store_results(request_id)
 
         assert_equals(self.storage.count_results(request_id), len(results))
+
+    def test_counts_errors(self):
+        f, args, request_id = self.add_request()
+        results, errors = self.store_results_and_errors(request_id)
+
+        assert_equals(self.storage.count_errors(request_id), len(errors))
+
+    def test_counts_results_and_errors(self):
+        f, args, request_id = self.add_request()
+        results, errors = self.store_results_and_errors(request_id)
+
+        s = len(results) + len(errors)
+        assert_equals(self.storage.count_results_and_errors(request_id), s)
+
+    def test_counts_tasks(self):
+        f, args, request_id = self.add_request()
+        assert_equals(self.storage.count_tasks(request_id), len(args))

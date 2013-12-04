@@ -23,9 +23,16 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 
 CREATE TABLE IF NOT EXISTS results (
-    id INTEGER INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     task_id INTEGER,
     result BLOB,
+    FOREIGN KEY (task_id) REFERENCES tasks(id)
+);
+
+CREATE TABLE IF NOT EXISTS errors (
+    id INTEGER PRIMARY KEY,
+    task_id INTEGER,
+    error TEXT,
     FOREIGN KEY (task_id) REFERENCES tasks(id)
 );
 """
@@ -54,7 +61,6 @@ class Storage:
         c = self.conn.cursor()
         c.executescript(schema)
         self.conn.commit()
-        c.close()
 
     def new_request(self, serialised_function, args_list):
         """Add a new request to the database.
@@ -79,8 +85,6 @@ class Storage:
         c.executemany("INSERT INTO tasks (request_id, job_index, args)"
                       " VALUES (?, ?, ?)", tasks_list)
         self.conn.commit()
-        c.close()
-
         return request_id
 
     def get_details(self, request_id, job_index):
@@ -94,27 +98,38 @@ class Storage:
         details = c.fetchone()
         if not details:
             raise ValueError("No details found for specified request and job.")
-        c.close()
         return details
 
-    def store_result(self, request_id, job_index, result):
-        """Store a new result from a given request_id and job_index."""
+    def _get_task_id(self, request_id, job_index):
+        """Retrieve the task ID for a given request ID and job index."""
         c = self.conn.cursor()
         c.execute("SELECT id FROM tasks"
                   " WHERE request_id=? AND job_index=?",
                   (request_id, job_index))
         task_id = c.fetchone()
         if not task_id:
-            c.close()
             raise ValueError("No task found for specified request and job.")
+        return task_id[0]
+
+
+    def store_result(self, request_id, job_index, result):
+        """Store a new result from a given request_id and job_index."""
+        task_id = self._get_task_id(request_id, job_index)
+        c = self.conn.cursor()
         c.execute("INSERT INTO results (task_id, result) VALUES (?, ?)",
-                  (task_id[0], result))
+                  (task_id, result))
         self.conn.commit()
-        c.close()
+
+    def store_error(self, request_id, job_index, error):
+        """Store an error resulting from a computation."""
+        task_id = self._get_task_id(request_id, job_index)
+        c = self.conn.cursor()
+        c.execute("INSERT INTO errors (task_id, error) VALUES (?, ?)",
+                  (task_id, error))
+        self.conn.commit()
 
     def count_results(self, request_id):
-        """Count the number of results so far for the given request_id.
-        """
+        """Count the number of results so far for the given request_id."""
         c = self.conn.cursor()
         c.execute("SELECT COUNT(*)"
                   " FROM results"
@@ -122,16 +137,54 @@ class Storage:
                   " WHERE tasks.request_id=?", (request_id,))
         return c.fetchone()[0]
 
+    def count_errors(self, request_id):
+        """Count the number of errors reported so far."""
+        c = self.conn.cursor()
+        c.execute("SELECT COUNT(*)"
+                  " FROM errors"
+                  " JOIN tasks ON errors.task_id=tasks.id"
+                  " WHERE tasks.request_id=?", (request_id,))
+        return c.fetchone()[0]
+
+    def count_results_and_errors(self, request_id):
+        """Sum the result and error counts."""
+        return self.count_results(request_id) + self.count_errors(request_id)
+
+    def count_tasks(self, request_id):
+        """Count the total number of tasks for this request."""
+        c = self.conn.cursor()
+        c.execute("SELECT COUNT(*) FROM tasks WHERE tasks.request_id=?",
+                  (request_id,))
+        return c.fetchone()[0]
+
     def get_results(self, request_id):
         """Fetch all results for a given request_id.
 
         Returns a list of (args, result) items in the order of the original
         args_list provided to new_request.
+
+        Gaps are not filled in, so if results have not yet been submitted
+        the corresponding arguments will not appear in this list and this
+        list will be shorter than the length of args_list.
         """
         c = self.conn.cursor()
         c.execute("SELECT tasks.args, results.result"
                   " FROM results"
                   " JOIN tasks ON results.task_id=tasks.id"
+                  " WHERE tasks.request_id=?"
+                  " ORDER BY tasks.job_index", (request_id,))
+        return c.fetchall()
+    
+    def get_errors(self, request_id):
+        """Fetch all errors for a given request_id.
+
+        Returns a list of (args, error) items in the order of the original
+        args_list provided to new_request.
+        """
+        c = self.conn.cursor()
+        c.execute("SELECT tasks.args, errors.error"
+                  " FROM errors"
+                  " JOIN tasks ON errors.task_id=tasks.id"
                   " WHERE tasks.request_id=?"
                   " ORDER BY tasks.job_index", (request_id,))
         return c.fetchall()
