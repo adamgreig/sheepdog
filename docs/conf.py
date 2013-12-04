@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Sheepdog'
-copyright = '2013, Adam Greig'
+copyright = '2013, Adam Greig. Released under the MIT license.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
