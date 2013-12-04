@@ -79,11 +79,12 @@ class Storage:
         """
         c = self.conn.cursor()
         c.execute("INSERT INTO requests (function, date_submitted)"
-                  " VALUES (?, date('now'))", (serialised_function,))
+                  " VALUES (?, date('now'))",
+                  (sqlite3.Binary(serialised_function),))
         request_id = c.lastrowid
         tasks_list = []
         for idx, arg in enumerate(args_list):
-            tasks_list.append((request_id, idx + 1, arg))
+            tasks_list.append((request_id, idx + 1, sqlite3.Binary(arg)))
         c.executemany("INSERT INTO tasks (request_id, job_index, args)"
                       " VALUES (?, ?, ?)", tasks_list)
         self.conn.commit()
@@ -100,7 +101,7 @@ class Storage:
         details = c.fetchone()
         if not details:
             raise ValueError("No details found for specified request and job.")
-        return details
+        return (bytes(details[0]), bytes(details[1]))
 
     def _get_task_id(self, request_id, job_index):
         """Retrieve the task ID for a given request ID and job index."""
@@ -119,7 +120,7 @@ class Storage:
         task_id = self._get_task_id(request_id, job_index)
         c = self.conn.cursor()
         c.execute("INSERT INTO results (task_id, result) VALUES (?, ?)",
-                  (task_id, result))
+                  (task_id, sqlite3.Binary(result)))
         self.conn.commit()
 
     def store_error(self, request_id, job_index, error):
@@ -175,7 +176,7 @@ class Storage:
                   " JOIN tasks ON results.task_id=tasks.id"
                   " WHERE tasks.request_id=?"
                   " ORDER BY tasks.job_index", (request_id,))
-        return c.fetchall()
+        return [(bytes(r[0]), bytes(r[1])) for r in c.fetchall()]
     
     def get_errors(self, request_id):
         """Fetch all errors for a given request_id.
@@ -189,4 +190,4 @@ class Storage:
                   " JOIN tasks ON errors.task_id=tasks.id"
                   " WHERE tasks.request_id=?"
                   " ORDER BY tasks.job_index", (request_id,))
-        return c.fetchall()
+        return [(bytes(r[0]), r[1]) for r in c.fetchall()]

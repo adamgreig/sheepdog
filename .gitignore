@@ -3,4 +3,5 @@ dist/
 Sheepdog.egg-info
 MANIFEST
 __pycache__
+*.pyc
 sheepdog.sqlite

@@ -95,10 +95,7 @@ class TestClient:
             inner(0)
         func_bin = marshal.dumps(bad_function.__code__)
         request_id = self.storage.new_request(func_bin, self.args_bin)
-        self.client = client.Client(self.url, request_id, self.job_index)
+        client.Client(self.url, request_id, self.job_index).go()
 
-        self.client.get_details()
-        self.client.run()
-
-        assert_true("sheepdog.sheep.client.MyOwnException: oopsie!" in
+        assert_true("MyOwnException: oopsie!" in
                     self.storage.get_errors(request_id)[0][1])

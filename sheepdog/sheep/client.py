@@ -65,7 +65,7 @@ class Client:
         self._submit(self.url, dict(result=result))
 
     def _submit_error(self, error):
-        self._submit(self.url + "/error", dict(error=str(error)))
+        self._submit(self.url + "error", dict(error=str(error)))
 
     def _submit(self, url, data):
         data.update(
@@ -88,4 +88,5 @@ class Client:
         """
         self.get_details()
         self.run()
-        self.submit_results()
+        if hasattr(self, 'result'):
+            self.submit_results()

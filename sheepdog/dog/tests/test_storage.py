@@ -7,6 +7,7 @@ Released under the MIT license. See LICENSE file for details.
 Storage tests.
 """
 
+import sqlite3
 from nose.tools import assert_equals
 
 from sheepdog.dog import storage
@@ -40,15 +41,15 @@ class TestStorage:
 
         self.c.execute("SELECT * FROM requests")
         request = self.c.fetchone()
-        assert_equals(request[1], f)
+        assert_equals(request[1], sqlite3.Binary(f))
         assert_equals(reqid, request[0])
 
         self.c.execute("SELECT request_id, job_index, args FROM tasks")
         tasks = self.c.fetchall()
         assert_equals(len(tasks), 3)
-        assert_equals(tasks[0], (request[0], 1, args[0]))
-        assert_equals(tasks[1], (request[0], 2, args[1]))
-        assert_equals(tasks[2], (request[0], 3, args[2]))
+        assert_equals(tasks[0], (request[0], 1, sqlite3.Binary(args[0])))
+        assert_equals(tasks[1], (request[0], 2, sqlite3.Binary(args[1])))
+        assert_equals(tasks[2], (request[0], 3, sqlite3.Binary(args[2])))
 
     def test_gets_details(self):
         f, args, reqid = self.add_request()
@@ -77,9 +78,9 @@ class TestStorage:
         results = self.store_results(request_id)
 
         r = self.c.execute("SELECT task_id, result FROM results").fetchall()
-        assert_equals(r[0][1], results[0])
-        assert_equals(r[1][1], results[1])
-        assert_equals(r[2][1], results[2])
+        assert_equals(r[0][1], sqlite3.Binary(results[0]))
+        assert_equals(r[1][1], sqlite3.Binary(results[1]))
+        assert_equals(r[2][1], sqlite3.Binary(results[2]))
 
         self.c.execute("SELECT request_id, job_index FROM tasks"
                        " WHERE id=?", (r[1][0],))
