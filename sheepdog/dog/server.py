@@ -40,6 +40,15 @@ def submit_result():
     storage.store_result(request_id, job_index, result)
     return "OK"
 
+@app.route('/error', methods=['POST'])
+def report_error():
+    storage = get_storage()
+    request_id = int(request.form['request_id'])
+    job_index = int(request.form['job_index'])
+    error = str(request.form['error'])
+    storage.store_error(request_id, job_index, error)
+    return "OK"
+
 def get_storage():
     if not hasattr(g, '_storage'):
         dbfile = app.config['DBFILE']

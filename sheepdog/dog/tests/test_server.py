@@ -54,6 +54,13 @@ class TestServer:
         assert response.data == b"OK"
         assert self.storage.get_results(1) == [(b"b", b"abc")]
 
+    def test_submits_error(self):
+        error = "oops"
+        response = self.app.post(
+            '/error', data=dict(request_id=1, job_index=2, error=error))
+        assert response.data == b"OK"
+        assert self.storage.get_errors(1) == [(b"b", error)]
+
     def test_runs_server(self):
         # note that the server actually takes a short while to start up, so
         # requests might error out the first few times.
