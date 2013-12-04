@@ -4,6 +4,12 @@ Changelog
 Version 0.1
 -----------
 
+0.1.1
+^^^^^
+Released on 2013-12-04.
+
+Adds Python 2.7 compatibility by frobbing some bytes() in the sqlite stuff.
+
 0.1.0
 ^^^^^
 Released on 2013-12-04. First release.

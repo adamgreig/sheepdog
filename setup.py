@@ -8,7 +8,7 @@ except (IOError, ImportError):
 
 setup(
     name='Sheepdog',
-    version='0.1.0',
+    version='0.1.1',
     author='Adam Greig',
     author_email='adam@adamgreig.com',
     packages=['sheepdog', 'sheepdog.dog', 'sheepdog.sheep'],
@@ -26,7 +26,7 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Topic :: Scientific/Engineering',
     ],
