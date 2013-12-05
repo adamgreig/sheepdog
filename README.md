@@ -2,8 +2,22 @@
 
 [![Build Status](https://travis-ci.org/adamgreig/sheepdog.png?branch=master)](https://travis-ci.org/adamgreig/sheepdog)
 [![Coverage Status](https://coveralls.io/repos/adamgreig/sheepdog/badge.png?branch=master)](https://coveralls.io/r/adamgreig/sheepdog?branch=master)
+[![PyPi Version](https://pypip.in/v/Sheepdog/badge.png)](https://crate.io/package/Sheepdog)
 
 Make Grid Engine a bit more useful from Python.
+
+## Requirements
+
+* Python 2.7 or Python 3.3
+* [Flask](http://flask.pocoo.org/)
+* [Requests](http://python-requests.org/)
+* Optional: [Tornado](http://www.tornadoweb.org/) to speed up HTTP bits
+
+
+## License
+
+MIT, see LICENSE file.
+
 
 ## Overview
 
@@ -53,6 +67,7 @@ This is very similar to:
 * [Resque](http://resquework.org/). But Resque is written in Ruby, boo.
 * Every other distributed map compute queue thing ever written.
 
+
 ## Usage
 
 Ensure the GridEngine workers have Python available (you can specify where
@@ -70,11 +85,10 @@ Then,
     config = {"host": "fear"}
 
     results = sheepdog.map_sync(f, args, config)
-    print("\nReceived results:\n", results)
-    # Received results:
-    # [2, 3, 4]
+    print("Received results:", results)
+    # Received results: [2, 3, 4]
 ```
 
 ## Documentation
 
-For docs, see [http://sheepdog.readthedocs.org/].
+View Sheepdog on [ReadTheDocs](http://sheepdog.readthedocs.org/).
