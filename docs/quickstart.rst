@@ -39,11 +39,11 @@ your own Python 3.3. Endless fun awaits.
 Local Python
 ^^^^^^^^^^^^
 
-Locally you must have  `Flask <http://flask.pocoo.org/>`_ installed. If you
-have `Tornado <http://www.tornadoweb.org/>`_ installed it will be used instead
-of the Flask debug server, as it is faster and better. To run tests
-`Nose <https://nose.readthedocs.org>`_ is required, and Requests must be
-installed locally as well.
+Locally you must have  `Flask <http://flask.pocoo.org/>`_ and
+`Requests <python-requests.org>`_ installed. If you have
+`Tornado <http://www.tornadoweb.org/>`_ installed it will be used instead of
+the Flask debug server, as it is faster and better. To run tests
+`Nose <https://nose.readthedocs.org>`_ is required.
 
 Synchronous Map
 ---------------

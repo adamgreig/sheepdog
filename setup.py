@@ -8,7 +8,7 @@ except (IOError, ImportError):
 
 setup(
     name='Sheepdog',
-    version='0.1.1',
+    version='0.1.2',
     author='Adam Greig',
     author_email='adam@adamgreig.com',
     packages=['sheepdog', 'sheepdog.dog', 'sheepdog.sheep'],
@@ -20,6 +20,7 @@ setup(
     tests_require=['nose', 'requests'],
     install_requires=[
         "Flask >= 0.10.1",
+        "requests >= 2.0.1",
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

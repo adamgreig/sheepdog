@@ -4,6 +4,13 @@ Changelog
 Version 0.1
 -----------
 
+0.1.2
+^^^^^
+Released on 2013-12-05.
+
+Adds the Requests package to requirements as you can't actually run the local
+code without it.
+
 0.1.1
 ^^^^^
 Released on 2013-12-04.
