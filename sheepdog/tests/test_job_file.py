@@ -7,7 +7,7 @@ from sheepdog import job_file
 
 class TestJobFile:
     def test_includes_client(self):
-        assert "Clientside code." in job_file("", 0, 1)
+        assert "Sheepdog's clientside code." in job_file("", 0, 1)
 
     def test_ge_opts(self):
         assert "#$ -r y" in job_file("", 0, 1, ["-r y"])
