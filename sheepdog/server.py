@@ -3,6 +3,14 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Sheepdog's HTTP server endpoints.
+
+The Server class sets up a server on another subprocess, ready to receive
+requests from workers. Uses Tornado if available, else falls back to the Flask
+debug web server.
+"""
+
 import json
 import base64
 from multiprocessing import Process
