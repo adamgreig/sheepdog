@@ -3,6 +3,12 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Interface to the storage backend.
+
+Future plans involve porting most of those handwritten SQL to a sensible ORM.
+"""
+
 import sqlite3
 
 schema = """

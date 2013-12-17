@@ -3,6 +3,15 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Sheepdog's clientside code.
+
+This code is typically only run on the worker, and this file is currently
+only used by pasting it into a job file (as workers don't generally have
+sheepdog itself installed).
+"""
+
+
 import time
 import json
 import types

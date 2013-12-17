@@ -3,6 +3,19 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Sheepdog is a utility to run arbitary code on a GridEngine cluster and collect
+the results, typically by mapping a set of arguments to one function.
+
+Documentation: http://sheepdog.readthedocs.org
+
+Source code: https://github.com/adamgreig/sheepdog
+
+PyPI: https://pypi.python.org/pypi/Sheepdog
+
+Sheepdog is released under the MIT license, see the LICENSE file for details.
+"""
+
 import os
 import sys
 import time

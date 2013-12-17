@@ -3,6 +3,12 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Code for deploying code to servers and executing jobs on GridEngine.
+
+Right now this is a little unwieldly and uses SSH as a subprocess.
+"""
+
 # All I want for Christmas is Python 3 support in Paramiko.
 # Until then...
 

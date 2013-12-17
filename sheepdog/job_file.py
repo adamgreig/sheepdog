@@ -3,6 +3,13 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+"""
+Generate job files to send to the cluster.
+
+The template is filled in with the job specifics and the formatted string is
+returned ready for deployment.
+"""
+
 import inspect
 from sheepdog import client
 
@@ -26,6 +33,25 @@ Client("{url}", {request_id}, job_index).go()
 """
 
 def job_file(url, request_id, n_args, grid_engine_opts=None, shell=None):
+    """Format the template for a specific job, ready for deployment.
+       
+       *url* is the URL (including port) that the workers should contact to
+       fetch job information, including a trailing slash.
+
+       *request_id* is the request ID workers should use to associate
+       themselves with the correct request.
+
+       *n_args* is the number of jobs that will be queued in the array task,
+       the same as the number of arguments being mapped by sheepdog.
+
+       *grid_engine_opts* is a list of string arguments to Grid Engine to
+       specify options such as resource requirements. Defaults to "-r y", "-l
+       ubuntu=1" and "-l lr=0".
+
+       *shell* is the path to the Python that will execute the job. Could be a
+       system or user Python, so long as it meets the Sheepdog requirements.
+       Is used for the -S option to GridEngine as well as the script shebang.
+    """
     if grid_engine_opts is None:
         grid_engine_opts = ["-r y", "-l ubuntu=1", "-l lr=0"]
     if shell is None:

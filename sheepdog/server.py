@@ -21,6 +21,18 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def get_config():
+    """Endpoint for workers to fetch their configuration before execution.
+       Workers should specify `request_id` (integer) and `job_index` (integer)
+       from their job file.
+
+       Returns a JSON object:
+       
+       {"func": (base64 encoded serialised function object),
+        "args": (base64 encoded serialised arguments list)
+       }
+
+       with HTTP status 200 on success.
+    """
     storage = get_storage()
     request_id = int(request.args['request_id'])
     job_index = int(request.args['job_index'])
@@ -31,6 +43,12 @@ def get_config():
 
 @app.route('/', methods=['POST'])
 def submit_result():
+    """Endpoint for workers to submit results arising from successful function
+       execution. Should specify `request_id` (integer), `job_index` (integer)
+       and `result` (base64 encoded serialised result) HTTP POST parameters.
+
+       Returns the string "OK" and HTTP 200 on success.
+    """
     storage = get_storage()
     request_id = int(request.form['request_id'])
     job_index = int(request.form['job_index'])
@@ -40,6 +58,12 @@ def submit_result():
 
 @app.route('/error', methods=['POST'])
 def report_error():
+    """Endpoint for workers to report back errors in function execution.
+       Workers should specify `request_id` (integer), `job_index` (integer) and
+       `error` (an error string) HTTP POST parameters.
+
+       Returns the string "OK" and HTTP 200 on success.
+    """
     storage = get_storage()
     request_id = int(request.form['request_id'])
     job_index = int(request.form['job_index'])
@@ -48,12 +72,17 @@ def report_error():
     return "OK"
 
 def get_storage():
+    """Retrieve the request-local database connection, creating it if required.
+    """
     if not hasattr(g, '_storage'):
         dbfile = app.config['DBFILE']
         g._storage = Storage(dbfile) if dbfile else Storage()
     return g._storage
 
 def run_server(port=7676, dbfile=None):
+    """Start up the HTTP server. If Tornado is available it will be used, else
+       fall back to the Flask debug server.
+    """
     app.config['DBFILE'] = dbfile
     if USE_TORNADO:
         http_server = HTTPServer(WSGIContainer(app))
