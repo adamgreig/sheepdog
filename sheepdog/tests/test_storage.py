@@ -1,11 +1,7 @@
-"""
-Sheepdog
-Copyright 2013 Adam Greig
-
-Released under the MIT license. See LICENSE file for details.
-
-Storage tests.
-"""
+# Sheepdog
+# Copyright 2013 Adam Greig
+#
+# Released under the MIT license. See LICENSE file for details.
 
 import sqlite3
 from nose.tools import assert_equals

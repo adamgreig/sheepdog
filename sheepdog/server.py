@@ -1,11 +1,7 @@
-"""
-Sheepdog
-Copyright 2013 Adam Greig
-
-Released under the MIT license. See LICENSE file for details.
-
-HTTP server code.
-"""
+# Sheepdog
+# Copyright 2013 Adam Greig
+#
+# Released under the MIT license. See LICENSE file for details.
 
 import json
 import base64

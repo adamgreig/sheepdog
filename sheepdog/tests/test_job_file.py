@@ -1,11 +1,7 @@
-"""
-Sheepdog
-Copyright 2013 Adam Greig
-
-Released under the MIT license. See LICENSE file for details.
-
-Job file testing code.
-"""
+# Sheepdog
+# Copyright 2013 Adam Greig
+#
+# Released under the MIT license. See LICENSE file for details.
 
 from sheepdog import job_file
 
