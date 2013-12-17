@@ -14,10 +14,10 @@ import copy
 import socket
 import marshal
 
-from sheepdog.dog.server import Server
-from sheepdog.dog.storage import Storage
-from sheepdog.dog.deployment import deploy_and_run
-from sheepdog.sheep.job_file import job_file
+from sheepdog.server import Server
+from sheepdog.storage import Storage
+from sheepdog.deployment import deploy_and_run
+from sheepdog.job_file import job_file
 
 default_config = {
     "ssh_port": 22,

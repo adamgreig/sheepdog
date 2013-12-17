@@ -10,7 +10,7 @@ Storage tests.
 import sqlite3
 from nose.tools import assert_equals
 
-from sheepdog.dog import storage
+from sheepdog import storage
 
 class TestStorage:
     def setup(self):

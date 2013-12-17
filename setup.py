@@ -11,7 +11,7 @@ setup(
     version='0.1.2',
     author='Adam Greig',
     author_email='adam@adamgreig.com',
-    packages=['sheepdog', 'sheepdog.dog', 'sheepdog.sheep'],
+    packages=['sheepdog'],
     url='http://sheepdog.readthedocs.org',
     license='MIT',
     description='Shepherd GridEngine',

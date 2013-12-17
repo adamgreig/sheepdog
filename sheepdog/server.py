@@ -11,7 +11,7 @@ import json
 import base64
 from multiprocessing import Process
 from flask import Flask, request, g
-from sheepdog.dog.storage import Storage
+from sheepdog.storage import Storage
 
 try:
     from tornado.wsgi import WSGIContainer

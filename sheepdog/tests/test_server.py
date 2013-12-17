@@ -16,7 +16,7 @@ import tempfile
 import base64
 from nose.tools import assert_equals
 
-from sheepdog.dog import server, storage
+from sheepdog import server, storage
 
 
 def get_free_port():

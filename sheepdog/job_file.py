@@ -8,7 +8,7 @@ Job file generation code.
 """
 
 import inspect
-from sheepdog.sheep import client
+from sheepdog import client
 
 template = """#!{shell}
 {geopts}

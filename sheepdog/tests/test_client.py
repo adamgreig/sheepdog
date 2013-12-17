@@ -13,8 +13,7 @@ import marshal
 import tempfile
 from nose.tools import assert_equal, assert_raises, assert_true
 
-from sheepdog.dog import storage, server
-from sheepdog.sheep import client
+from sheepdog import storage, server, client
 
 def get_free_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
