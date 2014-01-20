@@ -1,4 +1,5 @@
 venv/
+venv*/
 dist/
 Sheepdog.egg-info
 MANIFEST
