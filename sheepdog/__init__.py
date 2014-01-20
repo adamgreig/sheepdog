@@ -16,6 +16,11 @@ PyPI: https://pypi.python.org/pypi/Sheepdog
 Sheepdog is released under the MIT license, see the LICENSE file for details.
 """
 
+__author__ = "Adam Greig <adam@adamgreig.com>"
+__version__ = "0.1.2"
+__version_info__ = tuple([int(d) for d in __version__.split(".")])
+__license__ = "MIT License"
+
 import os
 import sys
 import time

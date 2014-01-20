@@ -6,9 +6,16 @@ try:
 except (IOError, ImportError):
     long_description = ''
 
+def get_version():
+    with open("sheepdog/__init__.py") as f:
+        for line in f:
+            if line.startswith("__version__"):
+                return line[15:-2]
+    raise Exception("Could not find version number")
+
 setup(
     name='Sheepdog',
-    version='0.1.2',
+    version=get_version(),
     author='Adam Greig',
     author_email='adam@adamgreig.com',
     packages=['sheepdog'],
