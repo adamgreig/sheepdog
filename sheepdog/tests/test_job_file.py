@@ -9,6 +9,9 @@ class TestJobFile:
     def test_includes_client(self):
         assert "Sheepdog's clientside code." in job_file("", 0, 1)
 
+    def test_includes_serialisation(self):
+        assert "Sheepdog's serialisation functions" in job_file("", 0, 1)
+
     def test_ge_opts(self):
         assert "#$ -r y" in job_file("", 0, 1, ["-r y"])
 

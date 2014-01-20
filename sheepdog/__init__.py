@@ -17,7 +17,7 @@ Sheepdog is released under the MIT license, see the LICENSE file for details.
 """
 
 __author__ = "Adam Greig <adam@adamgreig.com>"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])
 __license__ = "MIT License"
 
@@ -26,26 +26,30 @@ import sys
 import time
 import copy
 import socket
-import marshal
 
 from sheepdog.server import Server
 from sheepdog.storage import Storage
 from sheepdog.deployment import deploy_and_run
 from sheepdog.job_file import job_file
 
+from sheepdog import serialisation
+
 default_config = {
     "ssh_port": 22,
     "ssh_user": os.getlogin(),
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
-    "ge_opts": [],
-    "shell": "/usr/bin/env python3",
+    "ge_opts": None,
+    "shell": "\"/usr/bin/env python3\"",
     "localhost": socket.getfqdn()
 }
 
 
-def map_sync(f, args, config):
+def map_sync(f, args, config, ns=None):
     """Run *f* with each of *args* on GridEngine and return the results.
+
+       Optionally *ns* is a dict containing a namespace to execute the function
+       in, which may itself contain additional functions.
        
        Blocks until all results are in.
 
@@ -59,14 +63,17 @@ def map_sync(f, args, config):
             `shell`: the path to the python to run the job with
             `localhost`: the hostname for workers to find the local host
     """
+    if not ns:
+        ns = {}
 
     conf = copy.copy(default_config)
     conf.update(config)
-    func_bin = marshal.dumps(f.__code__)
-    args_bin = [marshal.dumps(arg) for arg in args]
+    func_bin = serialisation.serialise_function(f)
+    args_bin = serialisation.serialise_args(args)
+    namespace_bin = serialisation.serialise_namespace(ns)
     storage = Storage(dbfile=conf['dbfile'])
     storage.initdb()
-    request_id = storage.new_request(func_bin, args_bin)
+    request_id = storage.new_request(func_bin, namespace_bin, args_bin)
     server = Server(port=conf['port'], dbfile=conf['dbfile'])
     url = "http://{0}:{1}/".format(conf['localhost'], conf['port'])
     n_args = len(args)
@@ -83,4 +90,5 @@ def map_sync(f, args, config):
         sys.stdout.flush()
         time.sleep(1)
 
-    return [marshal.loads(r[1]) for r in storage.get_results(request_id)]
+    return [serialisation.deserialise_pickle(r[1])
+            for r in storage.get_results(request_id)]

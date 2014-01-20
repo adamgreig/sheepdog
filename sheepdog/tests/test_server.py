@@ -9,10 +9,9 @@ import time
 import socket
 import requests
 import tempfile
-import base64
 from nose.tools import assert_equals
 
-from sheepdog import server, storage
+from sheepdog import server, storage, serialisation
 
 
 def get_free_port():
@@ -27,7 +26,7 @@ class TestServer:
         self.db_fd, self.dbfile = tempfile.mkstemp()
         self.storage = storage.Storage(dbfile=self.dbfile)
         self.storage.initdb()
-        self.storage.new_request(b"myfunc", [b"a", b"b", b"c"])
+        self.storage.new_request(b"myfunc", b"ns", [b"a", b"b", b"c"])
         server.app.config['TESTING'] = True
         server.app.config['DBFILE'] = self.dbfile
         self.port = get_free_port()
@@ -42,11 +41,11 @@ class TestServer:
     def test_gets_config(self):
         response = self.app.get('/?request_id=1&job_index=2')
         response = json.loads(response.data.decode())
-        assert base64.b64decode(response['func']) == b"myfunc"
-        assert base64.b64decode(response['args']) == b"b"
+        assert response['func'] == "myfunc"
+        assert response['args'] == "b"
 
     def test_submits_result(self):
-        result = base64.b64encode(b"abc").decode()
+        result = b"abc"
         response = self.app.post(
             '/', data=dict(request_id=1, job_index=2, result=result))
         assert response.data == b"OK"
@@ -74,4 +73,4 @@ class TestServer:
                 continue
         if tries == 30:
             raise RuntimeError("Could not connect to server after 30 tries.")
-        assert base64.b64decode(r['args']) == b"b"
+        assert r['args'] == "b"

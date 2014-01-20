@@ -12,7 +12,6 @@ debug web server.
 """
 
 import json
-import base64
 from multiprocessing import Process
 from flask import Flask, request, g
 from sheepdog.storage import Storage
@@ -35,8 +34,8 @@ def get_config():
 
        Returns a JSON object:
        
-       {"func": (base64 encoded serialised function object),
-        "args": (base64 encoded serialised arguments list)
+       {"func": (serialised function object),
+        "args": (serialised arguments list)
        }
 
        with HTTP status 200 on success.
@@ -45,22 +44,23 @@ def get_config():
     request_id = int(request.args['request_id'])
     job_index = int(request.args['job_index'])
     details = storage.get_details(request_id, job_index)
-    func = base64.b64encode(details[0]).decode()
-    args = base64.b64encode(details[1]).decode()
-    return json.dumps({"func": func, "args": args})
+    func = details[0].decode()
+    ns = details[1].decode()
+    args = details[2].decode()
+    return json.dumps({"func": func, "ns": ns, "args": args})
 
 @app.route('/', methods=['POST'])
 def submit_result():
     """Endpoint for workers to submit results arising from successful function
        execution. Should specify `request_id` (integer), `job_index` (integer)
-       and `result` (base64 encoded serialised result) HTTP POST parameters.
+       and `result` (serialised result) HTTP POST parameters.
 
        Returns the string "OK" and HTTP 200 on success.
     """
     storage = get_storage()
     request_id = int(request.form['request_id'])
     job_index = int(request.form['job_index'])
-    result = base64.b64decode(request.form['result'])
+    result = request.form['result'].encode()
     storage.store_result(request_id, job_index, result)
     return "OK"
 

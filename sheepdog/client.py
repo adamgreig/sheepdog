@@ -14,11 +14,16 @@ sheepdog itself installed).
 
 import time
 import json
-import types
-import base64
-import marshal
 import requests
 import traceback
+
+try:
+    deserialise_function
+except NameError:
+    from sheepdog.serialisation import (deserialise_function,
+                                        deserialise_arg,
+                                        deserialise_namespace,
+                                        serialise_pickle)
 
 class Client:
     """Find out what to do, do it, report back."""
@@ -48,11 +53,9 @@ class Client:
             raise RuntimeError("Could not connect to server.")
        
         r = r.json()
-        func_bin = base64.b64decode(r['func'])
-        args_bin = base64.b64decode(r['args'])
-        code = marshal.loads(func_bin)
-        self.func = types.FunctionType(code, globals(), "f")
-        self.args = marshal.loads(args_bin)
+        self.args = deserialise_arg(r['args'])
+        self.ns = deserialise_namespace(r['ns'])
+        self.func = deserialise_function(r['func'], self.ns)
 
     def run(self):
         """Run the downloaded function, storing the result."""
@@ -66,7 +69,7 @@ class Client:
     def submit_results(self):
         if not hasattr(self, 'result'):
             raise RuntimeError("Must call `run` before `submit_results`.")
-        result = base64.b64encode(marshal.dumps(self.result))
+        result = serialise_pickle(self.result)
         self._submit(self.url, dict(result=result))
 
     def _submit_error(self, error):

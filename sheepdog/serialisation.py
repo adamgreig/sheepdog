@@ -35,6 +35,10 @@ def deserialise_function(f, namespace=None):
     """
     if not namespace:
         namespace = globals()
+    else:
+        namespace = namespace.copy()
+    if "__builtins__" not in namespace:
+        namespace["__builtins__"] = __builtins__
     fcodebin = base64.b64decode(f)
     fcode = marshal.loads(fcodebin)
     return types.FunctionType(fcode, namespace)
@@ -49,8 +53,20 @@ def deserialise_pickle(args):
     """
     return pickle.loads(base64.b64decode(args))
 
-serialise_args = serialise_pickle
-deserialise_args = deserialise_pickle
+serialise_arg = serialise_pickle
+deserialise_arg = deserialise_pickle
+
+def serialise_args(args):
+    """Serialise each item in *args* using serialise_pickle, returning a list
+       of serialised items.
+    """
+    return [serialise_pickle(x) for x in args]
+
+def deserialise_args(args):
+    """Deserialise each item in *args* using deserialise_pickle, returning a
+       list of the original objects.
+    """
+    return [deserialise_pickle(x) for x in args]
 
 def serialise_namespace(ns):
     """Serialise a dict *ns* so that any functions in it are first converted to

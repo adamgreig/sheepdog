@@ -15,6 +15,7 @@ schema = """
 CREATE TABLE IF NOT EXISTS requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     function BLOB,
+    namespace BLOB,
     date_submitted TEXT
 );
 
@@ -66,23 +67,28 @@ class Storage:
         c.executescript(schema)
         self.conn.commit()
 
-    def new_request(self, serialised_function, args_list):
+    def new_request(self, serialised_function, serialised_namespace,
+                    args_list):
         """Add a new request to the database.
 
         serialised_function is some bytes object that should be given to
-        workers to turn into the code to execute, for instance marshalled
-        bytecode, or a string to compile.
+        workers to turn into the code to execute.
+
+        serialised_namespace is some bytes object that should be given to
+        workers alongside the serialised function to provide helper variables
+        and functions that the primary function requires.
 
         args_list is a list, tuple or other iterable where each item is
         some bytes object that should be given to workers to run their
-        target function with. Probably a marshalled tuple or similar.
+        target function with.
 
         Returns the new request ID.
         """
         c = self.conn.cursor()
-        c.execute("INSERT INTO requests (function, date_submitted)"
-                  " VALUES (?, date('now'))",
-                  (sqlite3.Binary(serialised_function),))
+        c.execute("INSERT INTO requests (function, namespace, date_submitted)"
+                  " VALUES (?, ?, date('now'))",
+                  (sqlite3.Binary(serialised_function),
+                   sqlite3.Binary(serialised_namespace)))
         request_id = c.lastrowid
         tasks_list = []
         for idx, arg in enumerate(args_list):
@@ -93,17 +99,18 @@ class Storage:
         return request_id
 
     def get_details(self, request_id, job_index):
-        """Get the target function and arguments for a given job index.
+        """Get the target function, namespace and arguments for a given job.
         """
         c = self.conn.cursor()
-        c.execute("SELECT requests.function, tasks.args FROM tasks"
+        c.execute("SELECT requests.function, requests.namespace, tasks.args"
+                  " FROM tasks"
                   " JOIN requests ON tasks.request_id=requests.id"
                   " WHERE request_id=? AND job_index=?",
                   (request_id, job_index))
         details = c.fetchone()
         if not details:
             raise ValueError("No details found for specified request and job.")
-        return (bytes(details[0]), bytes(details[1]))
+        return (bytes(details[0]), bytes(details[1]), bytes(details[2]))
 
     def _get_task_id(self, request_id, job_index):
         """Retrieve the task ID for a given request ID and job index."""
@@ -115,7 +122,6 @@ class Storage:
         if not task_id:
             raise ValueError("No task found for specified request and job.")
         return task_id[0]
-
 
     def store_result(self, request_id, job_index, result):
         """Store a new result from a given request_id and job_index."""
@@ -179,7 +185,7 @@ class Storage:
                   " WHERE tasks.request_id=?"
                   " ORDER BY tasks.job_index", (request_id,))
         return [(bytes(r[0]), bytes(r[1])) for r in c.fetchall()]
-    
+
     def get_errors(self, request_id):
         """Fetch all errors for a given request_id.
 

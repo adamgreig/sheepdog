@@ -27,18 +27,20 @@ class TestStorage:
 
     def add_request(self):
         f = b"i'm a function!"
+        ns = b"a namespace!"
         args = [b"abc", b"def", b"geh"]
-        reqid = self.storage.new_request(f, args)
+        reqid = self.storage.new_request(f, ns, args)
 
-        return f, args, reqid
+        return f, ns, args, reqid
 
     def test_adds_request(self):
-        f, args, reqid = self.add_request()
+        f, ns, args, reqid = self.add_request()
 
         self.c.execute("SELECT * FROM requests")
         request = self.c.fetchone()
+        assert_equals(request[0], reqid)
         assert_equals(request[1], sqlite3.Binary(f))
-        assert_equals(reqid, request[0])
+        assert_equals(request[2], sqlite3.Binary(ns))
 
         self.c.execute("SELECT request_id, job_index, args FROM tasks")
         tasks = self.c.fetchall()
@@ -48,10 +50,10 @@ class TestStorage:
         assert_equals(tasks[2], (request[0], 3, sqlite3.Binary(args[2])))
 
     def test_gets_details(self):
-        f, args, reqid = self.add_request()
+        f, ns, args, reqid = self.add_request()
         
         details = self.storage.get_details(reqid, 2)
-        assert_equals(details, (f, args[1]))
+        assert_equals(details, (f, ns, args[1]))
 
     def store_results(self, request_id):
         results = [b"ABC", b"DEF", b"GEH"]
@@ -70,7 +72,7 @@ class TestStorage:
         return results, errors
 
     def test_stores_results(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results = self.store_results(request_id)
 
         r = self.c.execute("SELECT task_id, result FROM results").fetchall()
@@ -84,7 +86,7 @@ class TestStorage:
         assert_equals(r[1], 2)
 
     def test_gets_results(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results = self.store_results(request_id)
         
         r = self.storage.get_results(request_id)
@@ -92,36 +94,36 @@ class TestStorage:
         assert_equals(r, list(zip(args, results)))
 
     def test_stores_errors(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results, errors = self.store_results_and_errors(request_id)
         r = self.c.execute("SELECT task_id, error FROM errors").fetchall()
         assert_equals(r[0][1], errors[0])
 
     def test_gets_errors(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results, errors = self.store_results_and_errors(request_id)
         r = self.storage.get_errors(request_id)
         assert_equals(r, list(zip(args[-1:], errors)))
 
     def test_counts_results(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results = self.store_results(request_id)
 
         assert_equals(self.storage.count_results(request_id), len(results))
 
     def test_counts_errors(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results, errors = self.store_results_and_errors(request_id)
 
         assert_equals(self.storage.count_errors(request_id), len(errors))
 
     def test_counts_results_and_errors(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         results, errors = self.store_results_and_errors(request_id)
 
         s = len(results) + len(errors)
         assert_equals(self.storage.count_results_and_errors(request_id), s)
 
     def test_counts_tasks(self):
-        f, args, request_id = self.add_request()
+        f, ns, args, request_id = self.add_request()
         assert_equals(self.storage.count_tasks(request_id), len(args))

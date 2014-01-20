@@ -3,7 +3,7 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 
 from sheepdog import serialisation
 
@@ -41,3 +41,11 @@ class TestSerialisation:
         del dns['f']
         del ns['f']
         assert_equal(ns, dns)
+
+    def test_serialises_lists_of_args(self):
+        args = [1, "two", 3.0, 4j, b"five"]
+        s = serialisation.serialise_args(args)
+        assert_equal(type(s), list)
+        assert_true(all(type(item) == bytes for item in s))
+        ds = serialisation.deserialise_args(s)
+        assert_equal(ds, args)
