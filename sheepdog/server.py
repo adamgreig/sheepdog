@@ -93,8 +93,7 @@ def run_server(port=7676, dbfile=None):
     """
     app.config['DBFILE'] = dbfile
     if USE_TORNADO:
-        http_server = HTTPServer(WSGIContainer(app))
-        http_server.listen(port)
+        HTTPServer(WSGIContainer(app)).listen(port)
         IOLoop.instance().start()
     else:
         app.run(host='0.0.0.0', port=port)

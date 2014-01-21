@@ -35,6 +35,7 @@ class TestServer:
 
     def teardown(self):
         self.server.stop()
+        del self.server
         os.close(self.db_fd)
         os.unlink(self.dbfile)
 
