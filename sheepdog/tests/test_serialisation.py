@@ -16,6 +16,28 @@ class TestSerialisation:
         f = serialisation.deserialise_function(fs)
         assert_equal(f(1, 2), myfunc(1, 2))
 
+    def test_serialises_functions_other_python(self):
+        # Check it does the right thing for the Python we're not running.
+        # Not strictly needed but it gets 100% test coverage!
+
+        def myfunc(a, b):
+            return a + b
+        
+        class FakeFunc:
+            pass
+
+        func = FakeFunc()
+
+        if hasattr(myfunc, "__code__"):
+            func.func_code = myfunc.__code__
+        else:
+            func.__code__ = myfunc.func_code
+
+        fs = serialisation.serialise_function(func)
+        assert_equal(type(fs), bytes)
+        f = serialisation.deserialise_function(fs)
+        assert_equal(f(1, 2), myfunc(1, 2))
+
     def test_serialises_functions_with_namespaces(self):
         def myfunc(a):
             return a + b
