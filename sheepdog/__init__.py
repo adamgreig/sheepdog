@@ -26,6 +26,7 @@ import sys
 import time
 import copy
 import socket
+import getpass
 
 from sheepdog.server import Server
 from sheepdog.storage import Storage
@@ -36,7 +37,7 @@ from sheepdog import serialisation
 
 default_config = {
     "ssh_port": 22,
-    "ssh_user": os.getlogin(),
+    "ssh_user": getpass.getuser(),
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
     "ge_opts": None,
