@@ -56,6 +56,15 @@ class TestClient:
         assert_equal(type(self.client.func), type(self.func))
         assert_equal(self.client.ns, self.ns)
 
+    def test_get_details_exceeds_retries(self):
+        self.client.HTTP_RETRIES = 1
+        self.client.url = "http://localhost:1/"
+        class FakeTime:
+            def sleep(self, x):
+                return
+        client.time = FakeTime()
+        assert_raises(RuntimeError, self.client.get_details)
+
     def test_doesnt_run_without_details(self):
         assert_raises(RuntimeError, self.client.run)
 
@@ -78,12 +87,29 @@ class TestClient:
         assert_equal(self.storage.get_results(self.request_id),
             [(self.args_bin[1], expected)])
 
+    def test_submit_exceeds_retries(self):
+        self.client.get_details()
+        self.client.run()
+        self.client.HTTP_RETRIES = 1
+        self.client.url = "http://localhost:1/"
+        class FakeTime:
+            def sleep(self, x):
+                return
+        client.time = FakeTime()
+        assert_raises(RuntimeError, self.client.submit_results)
+
     def test_submits_errors(self):
         self.client.get_details()
         self.client.run()
         self.client._submit_error("oops")
         assert_equal(self.storage.get_errors(self.request_id),
             [(self.args_bin[1], "oops")])
+
+    def test_go_wrapper(self):
+        self.client.go()
+        expected = serialisation.serialise_pickle(self.func(*self.args[1]))
+        assert_equal(self.storage.get_results(self.request_id),
+            [(self.args_bin[1], expected)])
 
     def test_catches_exceptions(self):
         def bad_function(a, b):
