@@ -22,6 +22,10 @@ The SSH port to connect to. Defaults to 22.
 ^^^^^^^^^^^^
 The username to connect with. Defaults to the current system user.
 
+``ssh_dir``
+^^^^^^^^^^^
+The remote directory to place job scripts in. Defaults to ``~/.sheepdog``.
+
 Local Server Options
 --------------------
 

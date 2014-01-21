@@ -38,6 +38,7 @@ from sheepdog import serialisation
 default_config = {
     "ssh_port": 22,
     "ssh_user": getpass.getuser(),
+    "ssh_dir": "~/.sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
     "ge_opts": None,
@@ -58,6 +59,7 @@ def map_sync(f, args, config, ns=None):
             `host`: the hostname to submit grid engine jobs to [required]
             `ssh_port`: the ssh port to connect on
             `ssh_user`: the ssh username to use
+            `ssh_dir`: the remote directory to put job scripts in
             `dbfile`: the filename for the results db
             `port`: the port for the server to listen on
             `ge_opts`: a list of grid engine options
@@ -81,7 +83,7 @@ def map_sync(f, args, config, ns=None):
     jf = job_file(url, request_id, n_args, conf['ge_opts'], conf['shell'])
     print("Deploying job with request ID {0}...".format(request_id))
     deploy_and_run(conf['host'], jf, request_id,
-                   conf['ssh_user'], conf['ssh_port'])
+                   conf['ssh_user'], conf['ssh_port'], conf['ssh_dir'])
 
     n_results = 0
     while n_results != n_args:

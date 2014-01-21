@@ -16,7 +16,8 @@ import os
 import tempfile
 import subprocess
 
-def deploy_and_run(host, jobfile, request_id, user=None, port=22):
+def deploy_and_run(host, jobfile, request_id, user=None, port=22,
+                   directory="~/.sheepdog"):
     """Deploy *jobfile* to *host*, using *request_id* to name it, then
        submit it to the GridEngine queue.
     """
@@ -26,14 +27,14 @@ def deploy_and_run(host, jobfile, request_id, user=None, port=22):
     hoststr = "{0}@{1}".format(user, host)
     scpportstr = "-P {0}".format(port)
     sshportstr = "-p {0}".format(port)
-    filestr = "{0}:~/.sheepdog/sheepdog_{1}.py".format(hoststr, request_id)
-    mkdirstr = "mkdir -p ~/.sheepdog"
-    submitstr = "qsub ~/.sheepdog/sheepdog_{0}.py".format(request_id)
+    filestr = "{0}:{1}/sheepdog_{2}.py".format(hoststr, directory, request_id)
+    mkdirstr = "mkdir -p {0}".format(directory)
+    submitstr = "qsub {0}/sheepdog_{1}.py".format(directory, request_id)
 
     rv = subprocess.call(["ssh", sshportstr, hoststr, mkdirstr])
 
     if rv:
-        raise RuntimeError("Error creating ~/.sheepdog")
+        raise RuntimeError("Error creating {0}".format(directory))
 
     fd, fp = tempfile.mkstemp()
     os.write(fd, jobfile.encode())
