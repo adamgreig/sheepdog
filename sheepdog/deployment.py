@@ -26,8 +26,14 @@ def deploy_and_run(host, jobfile, request_id, user=None, port=22):
     hoststr = "{0}@{1}".format(user, host)
     scpportstr = "-P {0}".format(port)
     sshportstr = "-p {0}".format(port)
-    filestr = "{0}:~/sheepdog_{1}.py".format(hoststr, request_id)
-    cmdstr = "qsub ~/sheepdog_{0}.py".format(request_id)
+    filestr = "{0}:~/.sheepdog/sheepdog_{1}.py".format(hoststr, request_id)
+    mkdirstr = "mkdir -p ~/.sheepdog"
+    submitstr = "qsub ~/.sheepdog/sheepdog_{0}.py".format(request_id)
+
+    rv = subprocess.call(["ssh", sshportstr, hoststr, mkdirstr])
+
+    if rv:
+        raise RuntimeError("Error creating ~/.sheepdog")
 
     fd, fp = tempfile.mkstemp()
     os.write(fd, jobfile.encode())
@@ -40,7 +46,7 @@ def deploy_and_run(host, jobfile, request_id, user=None, port=22):
     if rv:
         raise RuntimeError("Error uploading job file.")
 
-    rv = subprocess.call(["ssh", sshportstr, hoststr, cmdstr])
+    rv = subprocess.call(["ssh", sshportstr, hoststr, submitstr])
 
     if rv:
         raise RuntimeError("Error submitting job request.")
