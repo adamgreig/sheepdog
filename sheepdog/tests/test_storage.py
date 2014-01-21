@@ -4,7 +4,7 @@
 # Released under the MIT license. See LICENSE file for details.
 
 import sqlite3
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_raises
 
 from sheepdog import storage
 
@@ -55,6 +55,15 @@ class TestStorage:
         details = self.storage.get_details(reqid, 2)
         assert_equals(details, (f, ns, args[1]))
 
+    def test_error_no_details(self):
+        f, ns, args, reqid = self.add_request()
+        
+        invalid_reqid = reqid + 1
+        invalid_job = len(args) + 1
+
+        assert_raises(ValueError, self.storage.get_details, invalid_reqid, 2)
+        assert_raises(ValueError, self.storage.get_details, reqid, invalid_job)
+
     def store_results(self, request_id):
         results = [b"ABC", b"DEF", b"GEH"]
         for idx, result in enumerate(results):
@@ -104,6 +113,15 @@ class TestStorage:
         results, errors = self.store_results_and_errors(request_id)
         r = self.storage.get_errors(request_id)
         assert_equals(r, list(zip(args[-1:], errors)))
+
+    def test_error_storing_results(self):
+        f, ns, args, request_id = self.add_request()
+        invalid_reqid = request_id + 1
+        invalid_job = len(args) + 1
+        assert_raises(ValueError, self.storage.store_result, invalid_reqid,
+                      1, b"result")
+        assert_raises(ValueError, self.storage.store_result, request_id,
+                      invalid_job, b"result")
 
     def test_counts_results(self):
         f, ns, args, request_id = self.add_request()
