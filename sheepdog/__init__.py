@@ -41,7 +41,8 @@ default_config = {
     "ssh_dir": "~/.sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
-    "ge_opts": None,
+    "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0",
+                "-o ~/.sheepdog", "-e ~/.sheepdog"],
     "shell": "/usr/bin/env python",
     "localhost": socket.getfqdn()
 }
@@ -56,15 +57,33 @@ def map_sync(f, args, config, ns=None):
        Blocks until all results are in.
 
        *config* must be a dict including:
+
             `host`: the hostname to submit grid engine jobs to [required]
+
             `ssh_port`: the ssh port to connect on
+                        (default: 22)
+
             `ssh_user`: the ssh username to use
+                        (default: current username)
+
             `ssh_dir`: the remote directory to put job scripts in
+                       (default ~/.sheepdog)
+
             `dbfile`: the filename for the results db
+                      (default ./sheepdog.sqlite)
+
             `port`: the port for the server to listen on
+                    (default: 7676)
+
             `ge_opts`: a list of grid engine options
+                       (default: ["-r y", "-l ubuntu=1", "-l lr=0",
+                                  "-o ~/.sheepdog", "-e ~/.sheepdog"])
+
             `shell`: the path to the python to run the job with
+                     (default: "/usr/bin/env python")
+
             `localhost`: the hostname for workers to find the local host
+                         (default: system's FQDN)
     """
     if not ns:
         ns = {}
@@ -80,7 +99,7 @@ def map_sync(f, args, config, ns=None):
     server = Server(port=conf['port'], dbfile=conf['dbfile'])
     url = "http://{0}:{1}/".format(conf['localhost'], conf['port'])
     n_args = len(args)
-    jf = job_file(url, request_id, n_args, conf['ge_opts'], conf['shell'])
+    jf = job_file(url, request_id, n_args, conf['shell'], conf['ge_opts'])
     print("Deploying job with request ID {0}...".format(request_id))
     deploy_and_run(conf['host'], jf, request_id,
                    conf['ssh_user'], conf['ssh_port'], conf['ssh_dir'])

@@ -41,7 +41,7 @@ job_index = os.environ['SGE_TASK_ID']
 Client("{url}", {request_id}, job_index).go()
 """
 
-def job_file(url, request_id, n_args, grid_engine_opts=None, shell=None):
+def job_file(url, request_id, n_args, shell, grid_engine_opts):
     """Format the template for a specific job, ready for deployment.
        
        *url* is the URL (including port) that the workers should contact to
@@ -53,18 +53,13 @@ def job_file(url, request_id, n_args, grid_engine_opts=None, shell=None):
        *n_args* is the number of jobs that will be queued in the array task,
        the same as the number of arguments being mapped by sheepdog.
 
-       *grid_engine_opts* is a list of string arguments to Grid Engine to
-       specify options such as resource requirements. Defaults to "-r y", "-l
-       ubuntu=1" and "-l lr=0".
-
        *shell* is the path to the Python that will execute the job. Could be a
        system or user Python, so long as it meets the Sheepdog requirements.
        Is used for the -S option to GridEngine as well as the script shebang.
+
+       *grid_engine_opts* is a list of string arguments to Grid Engine to
+       specify options such as resource requirements. 
     """
-    if not grid_engine_opts:
-        grid_engine_opts = ["-r y", "-l ubuntu=1", "-l lr=0"]
-    if not shell:
-        shell = "/usr/bin/env python3"
     grid_engine_opts.append("-t 1-{0}".format(n_args))
     grid_engine_opts.append("-S {0}".format(shell))
     geopts = '\n'.join("#$ {0}".format(opt) for opt in grid_engine_opts)

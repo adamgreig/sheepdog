@@ -16,14 +16,10 @@ import os
 import tempfile
 import subprocess
 
-def deploy_and_run(host, jobfile, request_id, user=None, port=22,
-                   directory="~/.sheepdog"):
-    """Deploy *jobfile* to *host*, using *request_id* to name it, then
-       submit it to the GridEngine queue.
+def deploy_and_run(host, jobfile, request_id, user, port, directory):
+    """Deploy *jobfile* to *user*@*host*:*port* in *directory*,
+       using *request_id* to name it, then submit it to the GridEngine cluster.
     """
-    if user is None:
-        user = os.getlogin()
-
     hoststr = "{0}@{1}".format(user, host)
     scpportstr = "-P {0}".format(port)
     sshportstr = "-p {0}".format(port)

@@ -9,6 +9,7 @@ Version 0.1
 Unreleased.
 
 * Improve test coverage
+* Refactor all default values to sheepdog/__init__.py
 
 0.1.3
 ^^^^^
