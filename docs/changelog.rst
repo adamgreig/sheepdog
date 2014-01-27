@@ -4,6 +4,12 @@ Changelog
 Version 0.1
 -----------
 
+0.1.4
+^^^^^
+Unreleased.
+
+* Improve test coverage
+
 0.1.3
 ^^^^^
 Released on 2014-01-21.
