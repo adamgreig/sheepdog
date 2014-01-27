@@ -43,7 +43,7 @@ default_config = {
     "port": 7676,
     "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0",
                 "-o ~/.sheepdog", "-e ~/.sheepdog"],
-    "shell": "/usr/bin/env python",
+    "shell": "/usr/bin/python",
     "localhost": socket.getfqdn()
 }
 
@@ -80,7 +80,7 @@ def map_sync(f, args, config, ns=None):
                                   "-o ~/.sheepdog", "-e ~/.sheepdog"])
 
             `shell`: the path to the python to run the job with
-                     (default: "/usr/bin/env python")
+                     (default: "/usr/bin/python")
 
             `localhost`: the hostname for workers to find the local host
                          (default: system's FQDN)
