@@ -61,7 +61,7 @@ def job_file(url, request_id, n_args, shell, grid_engine_opts):
        specify options such as resource requirements. 
     """
     grid_engine_opts.append("-t 1-{0}".format(n_args))
-    grid_engine_opts.append("-S {0}".format(shell))
+    grid_engine_opts.append("-S \"{0}\"".format(shell))
     geopts = '\n'.join("#$ {0}".format(opt) for opt in grid_engine_opts)
     client_code = inspect.getsource(client)
     serialisation_code = inspect.getsource(serialisation)
