@@ -66,3 +66,47 @@ Here's what it looks like:
     >>> conf = {"host": "fear"}
     >>> sheepdog.map_sync(f, args, conf)
     [2, 3, 4]
+
+Namespaces
+----------
+
+Often the target function will require other items be present in its namespace,
+for instance constants or other functions. These may be passed in the namespace
+parameter `ns` of map_sync:
+
+.. code-block:: python
+
+    >>> import sheepdog
+    >>> constant = 12
+    >>> def g(x):
+    ...     return x * 2
+    ...
+    >>> def f(a, b):
+    ...     return a + g(b) + constant
+    ...
+    >>> args = [(1, 2), (2, 3), (3, 4)]
+    >>> conf = {"host": "fear"}
+    >>> namespace = {"constant": constant, "g": g}
+    >>> sheepdog.map_sync(f, args, conf)
+    [17, 20, 23] 
+
+Imports
+-------
+
+Sheepdog doesn't currently provide for automatic handling of imports and
+dependencies. Please ensure that all required Python packages are available on
+the execution hosts. To actually run the import, put it at the top of your
+function, optionally exporting the package so that other functions can use it.
+
+For example:
+
+.. code-block:: python
+
+    >>> def g(x):
+    ...     return np.mean(x)
+    ...
+    >>> def f(x):
+    ...     import numpy as np
+    ...     global np
+    ...     return g(x)
+    ...

@@ -42,7 +42,7 @@ default_config = {
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
     "ge_opts": None,
-    "shell": "\"/usr/bin/env python3\"",
+    "shell": "/usr/bin/env python",
     "localhost": socket.getfqdn()
 }
 

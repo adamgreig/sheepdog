@@ -90,6 +90,22 @@ Then,
     # Received results: [2, 3, 4]
 ```
 
+There is also support for transferring other functions and variables (using the
+namespace parameter `ns` of map_sync) and imports can be handled using
+`global`, for example:
+
+```python
+    def f(a, b):
+        import numpy as np
+        global np
+        return g(x)
+
+    def g(x):
+        return np.mean(x)
+```
+
+See the documentation for full details.
+
 ## Documentation
 
 View Sheepdog on [ReadTheDocs](http://sheepdog.readthedocs.org/).
