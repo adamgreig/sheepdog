@@ -38,11 +38,11 @@ from sheepdog import serialisation
 default_config = {
     "ssh_port": 22,
     "ssh_user": getpass.getuser(),
-    "ssh_dir": "~/.sheepdog",
+    "ssh_dir": "$HOME/.sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
-    "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0",
-                "-o ~/.sheepdog", "-e ~/.sheepdog"],
+    "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0", "-wd $HOME/.sheepdog/",
+                "-o $HOME/.sheepdog/", "-e $HOME/.sheepdog/"],
     "shell": "/usr/bin/python",
     "localhost": socket.getfqdn()
 }
@@ -67,7 +67,7 @@ def map_sync(f, args, config, ns=None):
                         (default: current username)
 
             `ssh_dir`: the remote directory to put job scripts in
-                       (default ~/.sheepdog)
+                       (default $HOME/.sheepdog)
 
             `dbfile`: the filename for the results db
                       (default ./sheepdog.sqlite)
@@ -77,7 +77,9 @@ def map_sync(f, args, config, ns=None):
 
             `ge_opts`: a list of grid engine options
                        (default: ["-r y", "-l ubuntu=1", "-l lr=0",
-                                  "-o ~/.sheepdog", "-e ~/.sheepdog"])
+                                  "-wd $HOME/.sheepdog/",
+                                  "-o $HOME/.sheepdog/",
+                                  "-e $HOME/.sheepdog/"])
 
             `shell`: the path to the python to run the job with
                      (default: "/usr/bin/python")
