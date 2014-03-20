@@ -54,6 +54,7 @@ class TestClient:
         self.client.get_details()
         assert_equal(self.client.args, self.args[1])
         assert_equal(type(self.client.func), type(self.func))
+        del self.client.ns["__builtins__"]
         assert_equal(self.client.ns, self.ns)
 
     def test_get_details_exceeds_retries(self):

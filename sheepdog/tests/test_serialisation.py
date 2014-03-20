@@ -62,6 +62,7 @@ class TestSerialisation:
         assert_equal(dns['f'](1), 13)
         del dns['f']
         del ns['f']
+        del dns['__builtins__']
         assert_equal(ns, dns)
 
     def test_serialises_lists_of_args(self):
