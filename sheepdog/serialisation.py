@@ -35,8 +35,6 @@ def deserialise_function(f, namespace=None):
     """
     if not namespace:
         namespace = globals()
-    else:
-        namespace = namespace.copy()
     if "__builtins__" not in namespace:
         namespace["__builtins__"] = __builtins__
     fcodebin = base64.b64decode(f)
