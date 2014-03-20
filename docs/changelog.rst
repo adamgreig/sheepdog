@@ -4,6 +4,14 @@ Changelog
 Version 0.1
 -----------
 
+0.1.5
+^^^^^
+Released on 2014-03-20.
+
+* Fix bug where ge_opts would be appended to every map_sync call
+* Fix bug where functions in the request namespace only got a copy
+  of the namespace so global imports etc would not work
+
 0.1.4
 ^^^^^
 Released on 2014-03-20.
