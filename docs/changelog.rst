@@ -4,6 +4,12 @@ Changelog
 Version 0.1
 -----------
 
+0.1.6
+^^^^^
+Released on 2014-03-20.
+
+* Fix tests for namespace serialisation.
+
 0.1.5
 ^^^^^
 Released on 2014-03-20.
