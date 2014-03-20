@@ -6,10 +6,14 @@ Version 0.1
 
 0.1.4
 ^^^^^
-Unreleased.
+Released on 2014-03-20.
 
 * Improve test coverage
 * Refactor all default values to sheepdog/__init__.py
+* Improved defaults:
+    * Use ~/.sheepdog as the default working directory on the remote host
+    * Use /usr/bin/python instead of /usr/bin/env python as this confuses GE
+    * Quote user-provided shells in case they contain a space
 
 0.1.3
 ^^^^^
