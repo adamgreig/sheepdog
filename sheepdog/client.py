@@ -72,6 +72,7 @@ class Client:
             raise RuntimeError("Must call `get_details` before `run`.")
         try:
             self.result = self.func(*self.args)
+            print(self.result)
         except:
             self._submit_error(traceback.format_exc())
 
