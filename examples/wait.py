@@ -1,3 +1,6 @@
+# Quick sample of waiting on a specific request ID, say if you accidentally
+# killed the main script. Better hope nothing finished between then and
+# starting this though...
 import sys
 import time
 import sheepdog
