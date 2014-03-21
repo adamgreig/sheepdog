@@ -15,6 +15,7 @@ Contents:
 
    quickstart
    configuration
+   ssh
    changelog
    code/modules
 
