@@ -4,6 +4,13 @@ Changelog
 Version 0.1
 -----------
 
+0.1.7
+^^^^^
+Released on 2014-03-21.
+
+* Fix Py2 by using list() instead of list.copy()
+
+
 0.1.6
 ^^^^^
 Released on 2014-03-20.
