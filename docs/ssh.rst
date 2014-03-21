@@ -23,7 +23,7 @@ the host manually to add the key to the agent, or use ``ssh-add``.
 Known Hosts
 -----------
 
-Sheepdog uses `Paramiko https://github.com/paramiko/paramiko/`_ to connect to
+Sheepdog uses `Paramiko <https://github.com/paramiko/paramiko/>`_ to connect to
 SSH servers, and instructs it to read your ~/.ssh/known_hosts file to collect
 information on host keys. It does not permit it to connect without a valid
 known host key.
