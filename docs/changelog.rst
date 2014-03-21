@@ -4,6 +4,15 @@ Changelog
 Version 0.1
 -----------
 
+0.1.8
+^^^^^
+Released on 2014-03-21.
+
+* Swap to Paramiko for SSH usage. Much nicer.
+* Swap to urllib rather than Requests. A pity, but removes the dependency.
+* Fix Tornado starting from inside IPython Notebook.
+* Clients now print out their results so GridEngine can save it in the .o files
+
 0.1.7
 ^^^^^
 Released on 2014-03-21.
