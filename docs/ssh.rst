@@ -10,7 +10,7 @@ SSH Keys
 Sheepdog will only use SSH keys to connect to the remote server. If you don't
 already have these set up, it is simple to do so:
 
-.. code-block::
+.. code-block:: console
 
     local$ ssh-keygen
     local$ ssh-copy-id remote
@@ -36,7 +36,7 @@ the ECDSA key) and refuse to connect to the server.
 One workaround for this problem is to fetch the RSA key of the server and place
 it into your known_hosts, for instance:
 
-.. code-block::
+.. code-block:: console
 
     local$ ssh remote ssh-keyscan -t rsa remote >> ~/.ssh/known_hosts
     local$ ssh-keygen -H
