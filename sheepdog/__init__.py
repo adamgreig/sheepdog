@@ -1,5 +1,5 @@
 # Sheepdog
-# Copyright 2013 Adam Greig
+# Copyright 2013, 2014 Adam Greig
 #
 # Released under the MIT license. See LICENSE file for details.
 
@@ -30,7 +30,7 @@ import getpass
 
 from sheepdog.server import Server
 from sheepdog.storage import Storage
-from sheepdog.deployment import deploy_and_run
+from sheepdog.deployment import Deployer
 from sheepdog.job_file import job_file
 
 from sheepdog import serialisation
@@ -38,7 +38,7 @@ from sheepdog import serialisation
 default_config = {
     "ssh_port": 22,
     "ssh_user": getpass.getuser(),
-    "ssh_dir": "$HOME/.sheepdog",
+    "ssh_dir": ".sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": 7676,
     "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0", "-wd $HOME/.sheepdog/",
@@ -66,8 +66,9 @@ def map_sync(f, args, config, ns=None):
             `ssh_user`: the ssh username to use
                         (default: current username)
 
-            `ssh_dir`: the remote directory to put job scripts in
-                       (default $HOME/.sheepdog)
+            `ssh_dir`: the remote directory to put job scripts in,
+                       relative to home directory if a relative path is given
+                       (default .sheepdog)
 
             `dbfile`: the filename for the results db
                       (default ./sheepdog.sqlite)
@@ -103,8 +104,9 @@ def map_sync(f, args, config, ns=None):
     n_args = len(args)
     jf = job_file(url, request_id, n_args, conf['shell'], conf['ge_opts'])
     print("Deploying job with request ID {0}...".format(request_id))
-    deploy_and_run(conf['host'], jf, request_id,
-                   conf['ssh_user'], conf['ssh_port'], conf['ssh_dir'])
+    deployer = Deployer(conf['host'], conf['ssh_port'], conf['ssh_user'])
+    deployer.deploy(jf, request_id, conf['ssh_dir'])
+    deployer.submit(request_id, conf['ssh_dir'])
 
     n_results = 0
     while n_results != n_args:

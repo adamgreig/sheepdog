@@ -24,7 +24,8 @@ The username to connect with. Defaults to the current system user.
 
 ``ssh_dir``
 ^^^^^^^^^^^
-The remote directory to place job scripts in. Defaults to ``$HOME/.sheepdog``.
+The remote directory to place job scripts in. Relative paths will be
+relative to the user's home directory. Defaults to ``.sheepdog``.
 
 Local Server Options
 --------------------

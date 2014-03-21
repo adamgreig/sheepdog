@@ -28,6 +28,7 @@ setup(
     install_requires=[
         "Flask >= 0.10.1",
         "requests >= 2.0.1",
+        "paramiko == 1.13.0"
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
