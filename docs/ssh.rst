@@ -48,3 +48,7 @@ If a file ``~/.ssh/config`` exists, Sheepdog will use Paramiko to read this
 file and use it to determine hostnames, usernames and ports to connect to.
 In addition, ProxyCommand directives will also be followed. No other
 configuration parameters are used.
+
+If a hostname, username or port is found in the SSH config that matches the
+provided hostname, they will be used in preference to the ``ssh_user`` and
+``ssh_port`` configuration options.
