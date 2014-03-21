@@ -38,7 +38,7 @@ class Deployer:
 
         try:
             sftp.mkdir(directory, mode=0o750)
-        except OSError:
+        except (IOError, OSError):
             pass
 
         with sftp.open(path, 'w') as f:

@@ -65,6 +65,19 @@ class TestDeployment:
         sftp_cm.__enter__().write.assert_called_with("jobfile contents")
 
     @patch('sheepdog.deployment.paramiko.SSHClient')
+    def test_ignores_mkdir_failure(self, mock_ssh):
+        sftp_cm = MagicMock()
+        sftp = mock_ssh.return_value.open_sftp.return_value
+        sftp.open.return_value = sftp_cm
+        sftp.mkdir.side_effect = OSError()
+        d = sheepdog.deployment.Deployer("test", 22, "user")
+        d.deploy("jobfile contents", 123, "/path/to/dir")
+        mock_ssh.return_value.open_sftp.assert_called_with()
+        sftp.mkdir.assert_called_with("/path/to/dir", mode=0o750)
+        sftp.open.assert_called_with("/path/to/dir/sheepdog_123.py", 'w')
+        sftp_cm.__enter__().write.assert_called_with("jobfile contents")
+
+    @patch('sheepdog.deployment.paramiko.SSHClient')
     def test_submits(self, mock_ssh):
         mock_ssh.return_value.exec_command.return_value = (Mock(),)*3
         d = sheepdog.deployment.Deployer("test", 22, "user")
