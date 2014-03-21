@@ -24,6 +24,10 @@ def my_function(a, b):
 class TestClient:
     def setup(self):
         self.db_fd, self.dbfile = tempfile.mkstemp()
+
+        self.port = get_free_port()
+        self.server = server.Server(port=self.port, dbfile=self.dbfile)
+
         self.storage = storage.Storage(dbfile=self.dbfile)
         self.storage.initdb()
 
@@ -38,9 +42,6 @@ class TestClient:
         self.args_bin = serialisation.serialise_args(self.args)
 
         self.storage.new_request(self.func_bin, self.ns_bin, self.args_bin)
-
-        self.port = get_free_port()
-        self.server = server.Server(port=self.port, dbfile=self.dbfile)
 
         self.url = "http://localhost:{0}/".format(self.port)
         self.client = client.Client(self.url, self.request_id, self.job_index)
