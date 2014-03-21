@@ -98,10 +98,16 @@ namespace parameter `ns` of map_sync) and imports can be handled using
     def f(a, b):
         import numpy as np
         global np
-        return g(x)
+        return g(a, b)
 
-    def g(x):
-        return np.mean(x)
+    def g(a, b):
+        return np.array((a, b)) ** 2
+
+    args = [(1, 2), (3, 4)]
+    namespace = {"g": g}
+    config = {"host": "fear"}
+
+    results = sheepdog.map_sync(f, args, config, namespace)
 ```
 
 See the documentation for full details.
