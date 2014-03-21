@@ -10,8 +10,6 @@ Code for deploying code to servers and executing jobs on GridEngine.
 import os.path
 import paramiko
 
-paramiko.util.log_to_file("./paramiko_log")
-
 class Deployer:
     """Connect to a remote SSH server, copy a file over, run qsub."""
 
