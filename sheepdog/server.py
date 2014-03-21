@@ -93,6 +93,15 @@ def run_server(port=7676, dbfile=None):
     """
     app.config['DBFILE'] = dbfile
     if USE_TORNADO:
+        # When running inside an IPython Notebook, the IOLoop
+        # can inherit a stale instance from the parent process,
+        # so clear that.
+        # https://github.com/adamgreig/sheepdog/issues/15
+        # Thanks @minrk!
+        if hasattr(IOLoop, '_instance'):
+            del IOLoop._instance
+        IOLoop.clear_current()
+
         HTTPServer(WSGIContainer(app)).listen(port)
         IOLoop.instance().start()
     else:
