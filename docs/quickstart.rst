@@ -45,6 +45,15 @@ Locally you must have  `Flask <http://flask.pocoo.org/>`_ and
 the Flask debug server, as it is faster and better. To run tests
 `Nose <https://nose.readthedocs.org>`_ is required.
 
+If you're using Sheepdog inside of iPython Notebook, use of the Tornado server
+can be troublesome (see `https://github.com/adamgreig/sheepdog/issues/15`_),
+so consider falling back to the Flask server by:
+
+.. code-block:: python
+
+    >>> import sheepdog
+    >>> sheepdog.server.USE_TORNADO = False
+
 Synchronous Map
 ---------------
 

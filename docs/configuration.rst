@@ -24,7 +24,7 @@ The username to connect with. Defaults to the current system user.
 
 ``ssh_dir``
 ^^^^^^^^^^^
-The remote directory to place job scripts in. Defaults to ``~/.sheepdog``.
+The remote directory to place job scripts in. Defaults to ``$HOME/.sheepdog``.
 
 Local Server Options
 --------------------
@@ -59,7 +59,7 @@ is passed to the GridEngine -S option and placed on the script shebang.
 
 Should be a Python binary which the GridEngine worker can execute.
 
-Defaults to ``/usr/bin/env python3``.
+Defaults to ``/usr/bin/python``.
 
 ``ge_opts``
 ^^^^^^^^^^^
@@ -67,8 +67,15 @@ A list of strings containing GridEngine options. This is used to specify
 additional GridEngine related arguments, for example ``-l ubuntu=1`` to specify
 a resource requirement or ``-r y`` to specify that the job may be re-run.
 
-If unspecified defaults to ``["-r y", "-l ubuntu=1", "-l lr=0"]`` which is
-particularly helpful on ``fear`` and shouldn't be too adverse elsewhere.
+If unspecified, the defaults are:
+
+.. code-block:: python
+
+    ["-r y", "-l lr=0", "-l ubuntu=1",
+     "-wd $HOME/.sheepdog/", "-o $HOME/.sheepdog/", "-e $HOME/.sheepdog/"]
+
+which is particularly helpful on ``fear`` and shouldn't be too adverse
+elsewhere.
 
 Note that ``-S /path/to/shell`` is always specified by the ``shell`` option
 detailed above, and ``-t 1-N`` is always specified with N equal to the number
