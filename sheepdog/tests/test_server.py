@@ -7,9 +7,19 @@ import os
 import json
 import time
 import socket
-import requests
 import tempfile
 from nose.tools import assert_equals
+
+# The lengths I'll go to to avoid having any dependencies in the client code.
+# import requests ## I wish!
+try:
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
+    from urllib.error import URLError
+except ImportError:
+    from urllib import urlencode
+    from urllib2 import urlopen
+    from urllib2 import URLError
 
 from sheepdog import server, storage, serialisation
 
@@ -67,11 +77,12 @@ class TestServer:
         tries = 0
         while tries < 30:
             try:
-                r = requests.get(url).json()
+                response = urlopen(url)
                 break
-            except requests.ConnectionError:
+            except URLError:
                 tries += 1
                 continue
         if tries == 30:
             raise RuntimeError("Could not connect to server after 30 tries.")
-        assert r['args'] == "b"
+        result = json.loads(response.read().decode())
+        assert result['args'] == "b"

@@ -18,7 +18,7 @@ it. This might require having GridEngine stuff in your ``.bashrc``, so that
 ``ssh fear qstat -F no`` actually works.
 
 The cluster workers must be able to run a Python interpreter (you can specify
-the path to it) which must have `Requests <python-requests.org>`_ available.
+the path if you wish to use a custom interpreter).
 
 The cluster workers must be able to connect to the computer running Sheepdog on
 a TCP port (default 7676 but may be specified).
@@ -32,15 +32,11 @@ If you're also using ``fear``, put this in your ``.bashrc``::
 
     source /usr/local/grid/divf2/common/settings.sh
 
-You'll need to have a Python with Requests available (for now at least).
-Considering using a virtualenv with the system Python 2.7 or 3.2, or build
-your own Python 3.3. Endless fun awaits.
-
 Local Python
 ^^^^^^^^^^^^
 
 Locally you must have  `Flask <http://flask.pocoo.org/>`_ and
-`Requests <python-requests.org>`_ installed. If you have
+`Paramiko <https://github.com/paramiko/paramiko>`_ installed. If you have
 `Tornado <http://www.tornadoweb.org/>`_ installed it will be used instead of
 the Flask debug server, as it is faster and better. To run tests
 `Nose <https://nose.readthedocs.org>`_ is required.

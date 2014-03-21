@@ -14,8 +14,16 @@ sheepdog itself installed).
 
 import time
 import json
-import requests
 import traceback
+
+try:
+    from urllib.request import urlopen
+    from urllib.parse import urlencode
+    from urllib.error import URLError
+except ImportError:
+    from urllib import urlencode
+    from urllib2 import urlopen
+    from urllib2 import URLError
 
 try:
     deserialise_function
@@ -40,22 +48,23 @@ class Client:
         """
         url = self.url + "?request_id={0}&job_index={1}"
         url = url.format(self.request_id, self.job_index)
+        print("Getting: ", url)
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                r = requests.get(url)
+                response = urlopen(url)
                 break
-            except (requests.ConnectionError, requests.Timeout):
+            except URLError:
                 tries += 1
                 time.sleep(1)
                 continue
         if tries == self.HTTP_RETRIES:
             raise RuntimeError("Could not connect to server.")
        
-        r = r.json()
-        self.args = deserialise_arg(r['args'])
-        self.ns = deserialise_namespace(r['ns'])
-        self.func = deserialise_function(r['func'], self.ns)
+        result = json.loads(response.read().decode())
+        self.args = deserialise_arg(result['args'])
+        self.ns = deserialise_namespace(result['ns'])
+        self.func = deserialise_function(result['func'], self.ns)
 
     def run(self):
         """Run the downloaded function, storing the result."""
@@ -78,12 +87,13 @@ class Client:
     def _submit(self, url, data):
         data.update(
             {"request_id": self.request_id, "job_index": self.job_index})
+        encoded_data = urlencode(data).encode()
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                r = requests.post(url, data=data)
+                response = urlopen(url, data=encoded_data)
                 break
-            except (requests.ConnectionError, requests.Timeout):
+            except URLError:
                 tries += 1
                 time.sleep(1)
                 continue

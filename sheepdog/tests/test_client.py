@@ -76,6 +76,10 @@ class TestClient:
         assert_equal(self.client.result, self.func(*self.args[1]))
 
     def test_doesnt_submit_without_running(self):
+        class FakeTime:
+            def sleep(self, x):
+                return
+        client.time = FakeTime()
         assert_raises(RuntimeError, self.client.submit_results)
         self.client.get_details()
         assert_raises(RuntimeError, self.client.submit_results)

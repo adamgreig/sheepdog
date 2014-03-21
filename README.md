@@ -9,10 +9,18 @@ Make Grid Engine a bit more useful from Python.
 
 ## Requirements
 
+
+On the host:
+
 * Python 2.7 or Python 3.3
 * [Flask](http://flask.pocoo.org/)
-* [Requests](http://python-requests.org/)
 * Optional: [Tornado](http://www.tornadoweb.org/) to speed up HTTP bits
+* [Paramiko](https://github.com/paramiko/paramiko)
+
+On the worker nodes:
+
+* Tested on Python 2.7, Python 3.3
+* Should also work on Python 2.6 and 3.2
 
 
 ## License
@@ -71,8 +79,7 @@ This is very similar to:
 
 ## Usage
 
-Ensure the GridEngine workers have Python available (you can specify where
-the interpreter is) and that it has the requests module installed.
+Ensure the GridEngine workers have Python available.
 
 Then,
 

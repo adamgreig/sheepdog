@@ -24,10 +24,9 @@ setup(
     description='Shepherd GridEngine',
     long_description=long_description,
     test_suite='nose.collector',
-    tests_require=['nose', 'requests'],
+    tests_require=['nose', 'mock'],
     install_requires=[
         "Flask >= 0.10.1",
-        "requests >= 2.0.1",
         "paramiko == 1.13.0"
     ],
     classifiers=[
