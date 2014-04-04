@@ -59,7 +59,7 @@ Here's what it looks like:
     ...    return a + b
     ...
     >>> args = [(1, 1), (1, 2), (2, 2)]
-    >>> conf = {"host": "fear"}
+    >>> conf = {"host": "fear", "ge_opts": ["-l ubuntu=1", "-l lr=0"]}
     >>> sheepdog.map_sync(f, args, conf)
     [2, 3, 4]
 

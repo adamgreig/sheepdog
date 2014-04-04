@@ -41,8 +41,8 @@ default_config = {
     "ssh_dir": ".sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": None,
-    "ge_opts": ["-r y", "-l ubuntu=1", "-l lr=0", "-wd $HOME/.sheepdog/",
-                "-o $HOME/.sheepdog/", "-e $HOME/.sheepdog/"],
+    "ge_opts": ["-wd $HOME/.sheepdog/", "-o $HOME/.sheepdog/",
+                "-e $HOME/.sheepdog/"],
     "shell": "/usr/bin/python",
     "localhost": socket.getfqdn()
 }
@@ -77,8 +77,7 @@ def map_sync(f, args, config, ns=None):
                     (default: None, a random high-numbered available port)
 
             `ge_opts`: a list of grid engine options
-                       (default: ["-r y", "-l ubuntu=1", "-l lr=0",
-                                  "-wd $HOME/.sheepdog/",
+                       (default: ["-wd $HOME/.sheepdog/",
                                   "-o $HOME/.sheepdog/",
                                   "-e $HOME/.sheepdog/"])
 

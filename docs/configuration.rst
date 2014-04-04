@@ -74,11 +74,7 @@ If unspecified, the defaults are:
 
 .. code-block:: python
 
-    ["-r y", "-l lr=0", "-l ubuntu=1",
-     "-wd $HOME/.sheepdog/", "-o $HOME/.sheepdog/", "-e $HOME/.sheepdog/"]
-
-which is particularly helpful on ``fear`` and shouldn't be too adverse
-elsewhere.
+    ["-wd $HOME/.sheepdog/", "-o $HOME/.sheepdog/", "-e $HOME/.sheepdog/"]
 
 Note that ``-S /path/to/shell`` is always specified by the ``shell`` option
 detailed above, and ``-t 1-N`` is always specified with N equal to the number
