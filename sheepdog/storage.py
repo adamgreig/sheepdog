@@ -51,7 +51,7 @@ class Storage:
 
     """
 
-    def __init__(self, dbfile="./sheepdog.sqlite"):
+    def __init__(self, dbfile):
         """__init__ creates a database connection.
 
         dbfile is a file path for the sqlite file, or `:memory:` to only

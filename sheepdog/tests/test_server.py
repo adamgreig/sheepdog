@@ -6,7 +6,6 @@
 import os
 import json
 import time
-import socket
 import tempfile
 from nose.tools import assert_equals
 
@@ -24,13 +23,6 @@ except ImportError:
 from sheepdog import server, storage, serialisation
 
 
-def get_free_port():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", 0))
-    port = s.getsockname()[1]
-    s.close()
-    return port
-
 class TestServer:
     def setup(self):
         self.db_fd, self.dbfile = tempfile.mkstemp()
@@ -39,7 +31,7 @@ class TestServer:
         self.storage.new_request(b"myfunc", b"ns", [b"a", b"b", b"c"])
         server.app.config['TESTING'] = True
         server.app.config['DBFILE'] = self.dbfile
-        self.port = get_free_port()
+        self.port = server._get_free_port()
         self.server = server.Server(port=self.port, dbfile=self.dbfile)
         self.app = server.app.test_client()
 
@@ -86,3 +78,10 @@ class TestServer:
             raise RuntimeError("Could not connect to server after 30 tries.")
         result = json.loads(response.read().decode())
         assert result['args'] == "b"
+
+    def test_runs_on_some_port(self):
+        del self.server
+        self.server = server.Server(port=None, dbfile=self.dbfile)
+        self.port = self.server.port
+        assert self.port
+        self.test_runs_server()

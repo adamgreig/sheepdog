@@ -12,6 +12,7 @@ debug web server.
 """
 
 import json
+import socket
 from multiprocessing import Process
 from flask import Flask, request, g
 from sheepdog.storage import Storage
@@ -84,7 +85,7 @@ def get_storage():
     """
     if not hasattr(g, '_storage'):
         dbfile = app.config['DBFILE']
-        g._storage = Storage(dbfile) if dbfile else Storage()
+        g._storage = Storage(dbfile)
     return g._storage
 
 def _get_free_port():
@@ -95,14 +96,11 @@ def _get_free_port():
     s.close()
     return port
 
-def run_server(port=None, dbfile=None):
+def run_server(port, dbfile):
     """Start up the HTTP server. If Tornado is available it will be used, else
        fall back to the Flask debug server.
     """
     app.config['DBFILE'] = dbfile
-
-    if not port:
-        port = _get_free_port()
 
     if USE_TORNADO:
         # When running inside an IPython Notebook, the IOLoop
@@ -127,6 +125,10 @@ class Server:
     def __init__(self, port=None, dbfile=None):
         """__init__ creates and starts the HTTP server.
         """
+        if not port:
+            port = _get_free_port()
+        self.port = port
+        self.dbfile = dbfile
         self.server = Process(target=run_server, args=(port, dbfile))
         self.server.start()
 
