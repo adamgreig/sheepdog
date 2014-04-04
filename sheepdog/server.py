@@ -87,11 +87,23 @@ def get_storage():
         g._storage = Storage(dbfile) if dbfile else Storage()
     return g._storage
 
-def run_server(port=7676, dbfile=None):
+def _get_free_port():
+    """Get a port that should be free on the system."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+def run_server(port=None, dbfile=None):
     """Start up the HTTP server. If Tornado is available it will be used, else
        fall back to the Flask debug server.
     """
     app.config['DBFILE'] = dbfile
+
+    if not port:
+        port = _get_free_port()
+
     if USE_TORNADO:
         # When running inside an IPython Notebook, the IOLoop
         # can inherit a stale instance from the parent process,
@@ -112,7 +124,7 @@ class Server:
     """Run the HTTP server for workers to request arguments and return results.
     """
 
-    def __init__(self, port=7676, dbfile=None):
+    def __init__(self, port=None, dbfile=None):
         """__init__ creates and starts the HTTP server.
         """
         self.server = Process(target=run_server, args=(port, dbfile))

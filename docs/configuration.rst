@@ -43,7 +43,9 @@ Defaults to ``./sheepdog.sqlite``.
 The port that the local HTTP server will listen on. The GridEngine clients must
 be able to connect to the local computer on this port.
 
-Defaults to 7676.
+Defaults to None, which will cause Sheepdog to find an available high-numbered
+port and use that. Specify a particular port number if you wish to run on a
+specific port.
 
 ``localhost``
 ^^^^^^^^^^^^^

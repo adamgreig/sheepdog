@@ -21,7 +21,7 @@ The cluster workers must be able to run a Python interpreter (you can specify
 the path if you wish to use a custom interpreter).
 
 The cluster workers must be able to connect to the computer running Sheepdog on
-a TCP port (default 7676 but may be specified).
+a TCP port (defaults to a random available port but may be specified).
 
 Your GridEngine must support array jobs (the -t command).
 
