@@ -26,7 +26,8 @@ class TestClient:
         self.db_fd, self.dbfile = tempfile.mkstemp()
 
         self.port = get_free_port()
-        self.server = server.Server(port=self.port, dbfile=self.dbfile)
+        self.password = "password"
+        self.server = server.Server(self.port, self.password, self.dbfile)
 
         self.storage = storage.Storage(dbfile=self.dbfile)
         self.storage.initdb()
@@ -44,7 +45,8 @@ class TestClient:
         self.storage.new_request(self.func_bin, self.ns_bin, self.args_bin)
 
         self.url = "http://localhost:{0}/".format(self.port)
-        self.client = client.Client(self.url, self.request_id, self.job_index)
+        self.client = client.Client(self.url, self.password,
+                                    self.request_id, self.job_index)
 
     def teardown(self):
         self.server.stop()
@@ -127,7 +129,7 @@ class TestClient:
         func_bin = serialisation.serialise_function(bad_function)
         request_id = self.storage.new_request(func_bin, self.ns_bin,
                                               self.args_bin)
-        client.Client(self.url, request_id, self.job_index).go()
+        client.Client(self.url, self.password, request_id, self.job_index).go()
 
         print(self.storage.get_errors(request_id)[0][1])
         assert_true("MyOwnException: oopsie!" in

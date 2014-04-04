@@ -13,8 +13,9 @@ debug web server.
 
 import json
 import socket
+from functools import wraps
 from multiprocessing import Process
-from flask import Flask, request, g
+from flask import Flask, Response, request, g
 from sheepdog.storage import Storage
 
 try:
@@ -27,7 +28,20 @@ except ImportError:
 
 app = Flask(__name__)
 
+def check_auth(username, password):
+    return username == 'sheepdog' and password == app.config['PASSWORD'] 
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return Response("Unauthorized", 401)
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/', methods=['GET'])
+@requires_auth
 def get_config():
     """Endpoint for workers to fetch their configuration before execution.
        Workers should specify `request_id` (integer) and `job_index` (integer)
@@ -51,6 +65,7 @@ def get_config():
     return json.dumps({"func": func, "ns": ns, "args": args})
 
 @app.route('/', methods=['POST'])
+@requires_auth
 def submit_result():
     """Endpoint for workers to submit results arising from successful function
        execution. Should specify `request_id` (integer), `job_index` (integer)
@@ -66,6 +81,7 @@ def submit_result():
     return "OK"
 
 @app.route('/error', methods=['POST'])
+@requires_auth
 def report_error():
     """Endpoint for workers to report back errors in function execution.
        Workers should specify `request_id` (integer), `job_index` (integer) and
@@ -96,10 +112,11 @@ def _get_free_port():
     s.close()
     return port
 
-def run_server(port, dbfile):
+def run_server(port, password, dbfile):
     """Start up the HTTP server. If Tornado is available it will be used, else
        fall back to the Flask debug server.
     """
+    app.config['PASSWORD'] = password
     app.config['DBFILE'] = dbfile
 
     if USE_TORNADO:
@@ -122,14 +139,15 @@ class Server:
     """Run the HTTP server for workers to request arguments and return results.
     """
 
-    def __init__(self, port=None, dbfile=None):
+    def __init__(self, port, password, dbfile):
         """__init__ creates and starts the HTTP server.
         """
         if not port:
             port = _get_free_port()
         self.port = port
+        self.password = password
         self.dbfile = dbfile
-        self.server = Process(target=run_server, args=(port, dbfile))
+        self.server = Process(target=run_server, args=(port, password, dbfile))
         self.server.start()
 
     def stop(self):

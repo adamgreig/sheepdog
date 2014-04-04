@@ -25,7 +25,9 @@ import os
 import sys
 import time
 import copy
+import string
 import socket
+import random
 import getpass
 
 from sheepdog.server import Server
@@ -106,11 +108,15 @@ def map_sync(f, args, config, ns=None):
     storage.initdb()
     request_id = storage.new_request(func_bin, namespace_bin, args_bin)
 
-    server = Server(port=conf['port'], dbfile=conf['dbfile'])
-    url = "http://{0}:{1}/".format(conf['localhost'], conf['port'])
+    password = ''.join(random.choice(string.ascii_letters) for _ in range(30))
+
+    server = Server(conf['port'], password, conf['dbfile'])
+    port = server.port
+    url = "http://{0}:{1}/".format(conf['localhost'], port)
 
     n_args = len(args)
-    jf = job_file(url, request_id, n_args, conf['shell'], conf['ge_opts'])
+    jf = job_file(url, password, request_id, n_args,
+                  conf['shell'], conf['ge_opts'])
 
     print("Deploying job with request ID {0}...".format(request_id))
 

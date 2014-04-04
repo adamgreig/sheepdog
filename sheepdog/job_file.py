@@ -38,14 +38,16 @@ template = """#!{shell}
 
 import os
 job_index = os.environ['SGE_TASK_ID']
-Client("{url}", {request_id}, job_index).go()
+Client("{url}", "{password}", {request_id}, job_index).go()
 """
 
-def job_file(url, request_id, n_args, shell, grid_engine_opts):
+def job_file(url, password, request_id, n_args, shell, grid_engine_opts):
     """Format the template for a specific job, ready for deployment.
        
        *url* is the URL (including port) that the workers should contact to
        fetch job information, including a trailing slash.
+
+       *password* is the HTTP Basic Auth password to use when talking to *url*.
 
        *request_id* is the request ID workers should use to associate
        themselves with the correct request.

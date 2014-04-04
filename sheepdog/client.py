@@ -14,16 +14,16 @@ sheepdog itself installed).
 
 import time
 import json
+import base64
 import traceback
 
 try:
-    from urllib.request import urlopen
-    from urllib.parse import urlencode
     from urllib.error import URLError
+    from urllib.parse import urlencode
+    from urllib.request import urlopen, Request
 except ImportError:
     from urllib import urlencode
-    from urllib2 import urlopen
-    from urllib2 import URLError
+    from urllib2 import urlopen, Request, URLError
 
 try:
     deserialise_function
@@ -37,10 +37,15 @@ class Client:
     """Find out what to do, do it, report back."""
     HTTP_RETRIES = 10
 
-    def __init__(self, url, request_id, job_index):
+    def __init__(self, url, password, request_id, job_index):
         self.url = url
+        self.password = password
         self.request_id = request_id
         self.job_index = job_index
+
+        userpass = ("sheepdog:" + self.password).encode()
+        authstr = "Basic " + base64.b64encode(userpass).decode()
+        self.authhdr = {"Authorization": authstr}
 
     def get_details(self):
         """Retrieve the function to run and arguments to run with from the
@@ -49,10 +54,11 @@ class Client:
         url = self.url + "?request_id={0}&job_index={1}"
         url = url.format(self.request_id, self.job_index)
         print("Getting: ", url)
+        req = Request(url, headers=self.authhdr)
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                response = urlopen(url)
+                response = urlopen(req)
                 break
             except URLError:
                 tries += 1
@@ -89,10 +95,11 @@ class Client:
         data.update(
             {"request_id": self.request_id, "job_index": self.job_index})
         encoded_data = urlencode(data).encode()
+        req = Request(url, data=encoded_data, headers=self.authhdr)
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                response = urlopen(url, data=encoded_data)
+                response = urlopen(req)
                 break
             except URLError:
                 tries += 1
