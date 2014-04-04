@@ -4,6 +4,17 @@ Changelog
 Version 0.1
 -----------
 
+0.1.10
+^^^^^^
+Released on 2014-04-04.
+
+* Port is now selected at random by default (instead of 7676)
+* Removed fear-specific default `ge_opts`
+* Swaped to Marshall protocol 2 so 3.4 doesn't get sad, but still using Pickle
+  protocol 3 so Py3 hosts won't be able to talk to Py2 workers yet
+* Added `ssh_keyfile` option so a specific passphraseless SSH key can be used
+* Added HTTP Basic Auth to HTTP requests
+
 0.1.9
 ^^^^^
 Released on 2014-04-04.
