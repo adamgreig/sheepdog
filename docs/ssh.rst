@@ -15,10 +15,14 @@ already have these set up, it is simple to do so:
     local$ ssh-keygen
     local$ ssh-copy-id remote
 
-Additionally the keys should either be passwordless (inadvisable) or stored in
-an SSH agent, which Sheepdog will use automatically. Most operating systems
+Additionally the keys should either be passphraseless (inadvisable) or stored
+in an SSH agent, which Sheepdog will use automatically. Most operating systems
 will automatically set up an SSH agent for you, and you can either connect to
 the host manually to add the key to the agent, or use ``ssh-add``.
+
+Sheepdog will automatically find a key named `id_rsa` or `id_rsa` in `~/.ssh`,
+or you can set `ssh_keyfile` to a path to the (passphraseless) key file to
+use. The best way is still to use an SSH agent, though!
 
 Known Hosts
 -----------

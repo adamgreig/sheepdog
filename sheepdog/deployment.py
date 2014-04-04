@@ -13,20 +13,22 @@ import paramiko
 class Deployer:
     """Connect to a remote SSH server, copy a file over, run qsub."""
 
-    def __init__(self, host, port, user):
-        """__init__ takes (host, port, user) to specify which SSH
+    def __init__(self, host, port, user, keyfile=None):
+        """__init__ takes (host, port, user, keyfile) to specify which SSH
            server to connect to and how to connect to it.
         """
         self.host = host
         self.port = port
         self.user = user
+        self.keyfile = keyfile
         self.sock = None
 
         self.ssh = paramiko.SSHClient()
         self.ssh.load_system_host_keys()
         self._process_config()
 
-        self.ssh.connect(self.host, self.port, self.user, sock=self.sock)
+        self.ssh.connect(self.host, self.port, self.user,
+                         key_filename=keyfile, sock=self.sock)
 
     def deploy(self, jobfile, request_id, directory):
         """Copy *jobfile* (a string of the file contents) to the connected

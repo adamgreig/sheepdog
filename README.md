@@ -13,14 +13,15 @@ Make Grid Engine a bit more useful from Python.
 On the host:
 
 * Python 2.7 or Python 3.3
+* [Paramiko](https://github.com/paramiko/paramiko)
 * [Flask](http://flask.pocoo.org/)
 * Optional: [Tornado](http://www.tornadoweb.org/) to speed up HTTP bits
-* [Paramiko](https://github.com/paramiko/paramiko)
 
 On the worker nodes:
 
+* No requirements beyond the standard library
 * Tested on Python 2.7, Python 3.3
-* Should also work on Python 2.6 and 3.2
+* Should also work on Python 2.6 and 3.2, 3.4
 
 
 ## License

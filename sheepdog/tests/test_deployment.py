@@ -36,7 +36,8 @@ class TestDeployment:
         mock_proxy.assert_called_with("some command here")
         assert_equal(d.sock, mock_proxy.return_value)
         mock_ssh.return_value.connect.assert_called_with(
-            "test", 22, "user", sock=mock_proxy.return_value)
+            "test", 22, "user", key_filename=None,
+            sock=mock_proxy.return_value)
 
     @patch('sheepdog.deployment.paramiko')
     def test_jobfile_path(self, mock_paramiko):
@@ -50,7 +51,13 @@ class TestDeployment:
     def test_connects(self, mock_ssh):
         d = sheepdog.deployment.Deployer("test", 22, "user")
         mock_ssh.return_value.connect.assert_called_with(
-            "test", 22, "user", sock=None)
+            "test", 22, "user", sock=None, key_filename=None)
+
+    @patch('sheepdog.deployment.paramiko.SSHClient')
+    def test_uses_keyfile(self, mock_ssh):
+        d = sheepdog.deployment.Deployer("test", 22, "user", "keyfilepath")
+        mock_ssh.return_value.connect.assert_called_with(
+            "test", 22, "user", sock=None, key_filename="keyfilepath")
 
     @patch('sheepdog.deployment.paramiko.SSHClient')
     def test_deploys(self, mock_ssh):

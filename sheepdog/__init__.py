@@ -38,6 +38,7 @@ from sheepdog import serialisation
 default_config = {
     "ssh_port": 22,
     "ssh_user": getpass.getuser(),
+    "ssh_keyfile": None,
     "ssh_dir": ".sheepdog",
     "dbfile": "./sheepdog.sqlite",
     "port": None,
@@ -66,6 +67,10 @@ def map_sync(f, args, config, ns=None):
             `ssh_user`: the ssh username to use
                         (default: current username)
 
+            `ssh_keyfile`: The path to the passphraseless SSH key to use.
+                           (default: any acceptable key loaded in an SSH
+                            agent, or .ssh/id_rsa, or .ssh/id_dsa)
+
             `ssh_dir`: the remote directory to put job scripts in,
                        relative to home directory if a relative path is given
                        (default .sheepdog)
@@ -92,18 +97,25 @@ def map_sync(f, args, config, ns=None):
 
     conf = copy.copy(default_config)
     conf.update(config)
+
     func_bin = serialisation.serialise_function(f)
     args_bin = serialisation.serialise_args(args)
     namespace_bin = serialisation.serialise_namespace(ns)
+
     storage = Storage(dbfile=conf['dbfile'])
     storage.initdb()
     request_id = storage.new_request(func_bin, namespace_bin, args_bin)
+
     server = Server(port=conf['port'], dbfile=conf['dbfile'])
     url = "http://{0}:{1}/".format(conf['localhost'], conf['port'])
+
     n_args = len(args)
     jf = job_file(url, request_id, n_args, conf['shell'], conf['ge_opts'])
+
     print("Deploying job with request ID {0}...".format(request_id))
-    deployer = Deployer(conf['host'], conf['ssh_port'], conf['ssh_user'])
+
+    deployer = Deployer(
+        conf['host'], conf['ssh_port'], conf['ssh_user'], conf['ssh_keyfile'])
     deployer.deploy(jf, request_id, conf['ssh_dir'])
     deployer.submit(request_id, conf['ssh_dir'])
 

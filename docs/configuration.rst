@@ -22,6 +22,12 @@ The SSH port to connect to. Defaults to 22.
 ^^^^^^^^^^^^
 The username to connect with. Defaults to the current system user.
 
+``ssh_keyfile``
+^^^^^^^^^^^^^^^
+The path to the SSH key that should be used. The key must be passphraseless.
+Defaults to seeing if any key from an SSH agent or `.ssh/id_rsa` or
+`.ssh/id_dsa` may be used. Use of an SSH agent is recommended.
+
 ``ssh_dir``
 ^^^^^^^^^^^
 The remote directory to place job scripts in. Relative paths will be
