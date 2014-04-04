@@ -26,7 +26,7 @@ def serialise_function(f):
         fcode = f.__code__
     else:
         fcode = f.func_code
-    fcodebin = marshal.dumps(fcode)
+    fcodebin = marshal.dumps(fcode, 2)
     return base64.b64encode(fcodebin)
 
 def deserialise_function(f, namespace=None):
