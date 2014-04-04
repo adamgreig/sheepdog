@@ -4,6 +4,13 @@ Changelog
 Version 0.1
 -----------
 
+0.1.9
+^^^^^
+Released on 2014-04-04.
+
+* Documentation improvements
+* Actually release to PyPi, which got skipped for 0.1.8
+
 0.1.8
 ^^^^^
 Released on 2014-03-21.
