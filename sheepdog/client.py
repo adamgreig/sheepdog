@@ -11,6 +11,8 @@ only used by pasting it into a job file (as workers don't generally have
 sheepdog itself installed).
 """
 
+from __future__ import print_function
+
 
 import time
 import json
@@ -53,7 +55,7 @@ class Client:
         """
         url = self.url + "?request_id={0}&job_index={1}"
         url = url.format(self.request_id, self.job_index)
-        print("Getting: ", url)
+        print("Fetching URL: ", url)
         req = Request(url, headers=self.authhdr)
         tries = 0
         while tries < self.HTTP_RETRIES:

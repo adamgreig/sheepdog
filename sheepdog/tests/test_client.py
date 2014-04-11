@@ -131,6 +131,5 @@ class TestClient:
                                               self.args_bin)
         client.Client(self.url, self.password, request_id, self.job_index).go()
 
-        print(self.storage.get_errors(request_id)[0][1])
         assert_true("MyOwnException: oopsie!" in
                     self.storage.get_errors(request_id)[0][1])

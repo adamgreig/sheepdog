@@ -76,7 +76,6 @@ class TestStorage:
         for idx, result in enumerate(results):
             self.storage.store_result(request_id, idx+1, result)
         for eidx, error in enumerate(errors):
-            print("storing error {0} at {1}".format(error, idx+eidx+2))
             self.storage.store_error(request_id, idx+eidx+2, error)
         return results, errors
 
