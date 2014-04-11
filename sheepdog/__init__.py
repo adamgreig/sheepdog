@@ -19,7 +19,7 @@ Sheepdog is released under the MIT license, see the LICENSE file for details.
 from __future__ import print_function
 
 __author__ = "Adam Greig <adam@adamgreig.com>"
-__version__ = "0.1.10"
+__version__ = "0.2.0"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])
 __license__ = "MIT License"
 
@@ -95,7 +95,7 @@ def map_async(f, args, config, ns=None):
 
     return request_id
 
-def get_results(request_id, block=True, verbose=False):
+def get_results(request_id, dbfile, block=True, verbose=False):
     """Fetch results for *request_id*. If *block* is true, wait until all the
     results are in. Otherwise, return just what has been received so far.
 
@@ -103,28 +103,44 @@ def get_results(request_id, block=True, verbose=False):
     number of results.
 
     Returns a list of (arg, result) tuples.
+
+    Where an error occured or no result has been submitted yet, result will be
+    None.
     """
+    storage = Storage(dbfile=dbfile)
     n_args = storage.count_tasks(request_id)
     n_results = 0
     while True:
         n_results = storage.count_results(request_id)
+        n_errors = storage.count_errors(request_id)
         if verbose:
-            print("{}/{} results\r".format(n_results, n_args), flush=True)
-        if block:
+            print("{}/{} results, {} errors\r".format(
+                  n_results, n_args, n_errors))
+            sys.stdout.flush()
+        if not block or n_results + n_errors == n_args:
             break
         time.sleep(1)
 
     results = []
-    for result in storage.get_results(request_id):
-        results.append((
-            serialisation.deserialise_pickle(r[0]),
-            serialisation.deserialise_pickle(r[1])))
+    for r in storage.get_tasks_with_results(request_id):
+        r1 = r[1] if r[1] is None else serialisation.deserialise_pickle(r[1])
+        results.append((serialisation.deserialise_pickle(r[0]), r1))
 
     return results
 
+def get_errors(request_id, dbfile):
+    """Fetch all the errors returned so-far for *request_id*."""
+    storage = Storage(dbfile=dbfile)
+    errors = []
+    for error in storage.get_errors(request_id):
+        errors.append((serialisation.deserialise_pickle(error[0]), error[1]))
+    return errors
+
 def map(f, args, config, ns=None, verbose=True):
     """Submit *f* with each of *args* on GridEngine, wait until all the results
-       are in, and return them in the same order as *args*.
+       are in, and return them in the same order as *args*. If an error occured
+       for an arg, None is returned in that position. Call `get_errors` to get
+       details on the errors that occured.
        
        For details on *config*, see the documentation at:
        http://sheepdog.readthedocs.org/en/latest/configuration.html
@@ -137,4 +153,14 @@ def map(f, args, config, ns=None, verbose=True):
        waiting.
     """
     request_id = map_async(f, args, config, ns)
-    return get_results(request_id, block=True, verbose=True)
+
+    conf = copy.copy(default_config)
+    conf.update(config)
+    results = get_results(request_id, conf['dbfile'], block=True, verbose=True)
+    storage = Storage(dbfile=conf['dbfile'])
+
+    if storage.count_errors(request_id) != 0:
+        print("Some errors occured, view them with get_errors({}, '{}')"
+              .format(request_id, conf['dbfile']), file=sys.stderr)
+
+    return [r[1] for r in results]

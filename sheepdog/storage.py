@@ -189,6 +189,25 @@ class Storage:
                   " ORDER BY tasks.job_index", (request_id,))
         return [(bytes(r[0]), bytes(r[1])) for r in c.fetchall()]
 
+    def get_tasks_with_results(self, request_id):
+        """Fetch all tasks for a given request_id, including results for
+           all tasks where results have come in already.
+
+           Returns a list of (args, result) items in the order of the original
+           args_list provided to new_request, where result may be None.
+        """
+        c = self.conn.cursor()
+        c.execute("SELECT tasks.args, results.result"
+                  " FROM tasks"
+                  " LEFT OUTER JOIN results ON tasks.id=results.task_id"
+                  " WHERE tasks.request_id=?"
+                  " ORDER BY tasks.job_index", (request_id,))
+        results = []
+        for r in c.fetchall():
+            r1 = r[1] if r[1] is None else bytes(r[1])
+            results.append((bytes(r[0]), r1))
+        return results
+
     def get_errors(self, request_id):
         """Fetch all errors for a given request_id.
 

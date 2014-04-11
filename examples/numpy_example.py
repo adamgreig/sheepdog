@@ -1,6 +1,10 @@
-# Example Sheepdog script with numpy
-# We'll import and make global numpy inside our Sheepdog function,
-# and then any other function can also use it.
+"""
+Example Sheepdog script with numpy.
+
+We'll import and make global numpy inside our Sheepdog function,
+and then any other function can also use it.
+"""
+
 import sheepdog
 
 def f(a, b):
@@ -22,7 +26,7 @@ config = {
 
 namespace = {"g": g}
 
-results = sheepdog.map_sync(f, args, config, namespace)
+results = sheepdog.map(f, args, config, namespace)
 
 print("\nReceived results:")
 print(results)

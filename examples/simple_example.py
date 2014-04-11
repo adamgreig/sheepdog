@@ -1,4 +1,10 @@
-# Bog standard Sheepdog example script
+"""
+Bog standard Sheepdog example script.
+
+Defines a simple function, a short list of arguments to run it with,
+then submits it to a GridEngine cluster and waits for the results.
+"""
+
 import sheepdog
 
 def f(a, b):
@@ -13,7 +19,7 @@ config = {
     "host": "fear",
 }
 
-results = sheepdog.map_sync(f, args, config)
+results = sheepdog.map(f, args, config)
 
 print("\nReceived results:")
 print(results)

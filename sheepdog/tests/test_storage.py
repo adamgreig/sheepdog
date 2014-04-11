@@ -76,7 +76,7 @@ class TestStorage:
         for idx, result in enumerate(results):
             self.storage.store_result(request_id, idx+1, result)
         for eidx, error in enumerate(errors):
-            self.storage.store_error(request_id, idx+eidx+2, error)
+            self.storage.store_error(request_id, idx + 1 + eidx + 1, error)
         return results, errors
 
     def test_stores_results(self):
@@ -100,6 +100,12 @@ class TestStorage:
         r = self.storage.get_results(request_id)
 
         assert_equals(r, list(zip(args, results)))
+
+    def test_gets_tasks_with_results(self):
+        f, ns, args, request_id = self.add_request()
+        results, errors = self.store_results_and_errors(request_id)
+        r = self.storage.get_tasks_with_results(request_id)
+        assert_equals(r, list(zip(args, results + [None] * len(errors))))
 
     def test_stores_errors(self):
         f, ns, args, request_id = self.add_request()

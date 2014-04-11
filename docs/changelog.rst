@@ -1,14 +1,26 @@
 Changelog
 =========
 
-Version 0.1
+Version 0.2
 -----------
 
-0.1.11
-^^^^^^
+Starting to become stable and useful.
+
+0.2.0
+^^^^^
+Released on 2014-04-11
 
 * Keep track of what servers are running to prevent duplicates being started
 * Allow specification of pickle and marshal protocol versions
+* Refactor __init__'s map_sync into map_async, get_results and map
+  * *note that `map_sync` is now `map`*
+* Handle task errors in the top level map and get_results functions
+* Tidy examples somewhat
+
+Version 0.1
+-----------
+
+Early work.
 
 0.1.10
 ^^^^^^

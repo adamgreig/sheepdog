@@ -1,4 +1,7 @@
-# Sheepdog example script demonstrating namespace usage
+"""
+Sheepdog example script demonstrating namespace usage.
+"""
+
 import sheepdog
 
 def f(a, b):
@@ -20,7 +23,7 @@ config = {
     "host": "fear",
 }
 
-results = sheepdog.map_sync(f, args, config, namespace)
+results = sheepdog.map(f, args, config, namespace)
 
 print("\nReceived results:")
 print(results)
