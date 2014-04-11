@@ -21,7 +21,10 @@ import marshal
 # The protocols used for encoding may be changed by changing these variables.
 # Set pickle_protocol to 2 for compatibility between py2 and py3, and set
 # marshal_version to 2 for compatibility between py3.4 and py3.3. Etc.
-pickle_protocol = pickle.DEFAULT_PROTOCOL
+if hasattr(pickle, 'DEFAULT_PROTOCOL'):
+    pickle_protocol = pickle.DEFAULT_PROTOCOL
+else:
+    pickle_protocol = pickle.HIGHEST_PROTOCOL
 marshal_version = marshal.version
 
 

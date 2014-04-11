@@ -76,12 +76,17 @@ class TestSerialisation:
 
     def test_changes_pickle_version(self):
         s = serialisation.serialise_pickle((1, 2, 3))
-        assert (serialisation.pickle_protocol == 
-                serialisation.pickle.DEFAULT_PROTOCOL)
+        if hasattr(serialisation.pickle, 'DEFAULT_PROTOCOL'):
+            pp = serialisation.pickle.DEFAULT_PROTOCOL
+        else:
+            pp = serialisation.pickle.HIGHEST_PROTOCOL
+        assert serialisation.pickle_protocol == pp
         p = base64.b64decode(s)
-        assert p[1] == serialisation.pickle_protocol
+        proto = ord(p[1]) if type(p) is str else p[1]
+        assert proto == serialisation.pickle_protocol
 
         serialisation.pickle_protocol = 2
         s = serialisation.serialise_pickle((1, 2, 3))
         p = base64.b64decode(s)
-        assert p[1] == 2
+        proto = ord(p[1]) if type(p) is str else p[1]
+        assert proto == 2
