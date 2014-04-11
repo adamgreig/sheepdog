@@ -16,6 +16,8 @@ PyPI: https://pypi.python.org/pypi/Sheepdog
 Sheepdog is released under the MIT license, see the LICENSE file for details.
 """
 
+from __future__ import print_function
+
 __author__ = "Adam Greig <adam@adamgreig.com>"
 __version__ = "0.1.10"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])
@@ -51,48 +53,16 @@ default_config = {
 }
 
 
-def map_sync(f, args, config, ns=None):
-    """Run *f* with each of *args* on GridEngine and return the results.
+def map_async(f, args, config, ns=None):
+    """Submit *f* with each of *args* on GridEngine, returning the
+       (sheepdog-local) request ID.
+       
+       For details on *config*, see the documentation at:
+       http://sheepdog.readthedocs.org/en/latest/configuration.html
+       Or in docs/configuration.rst.
 
        Optionally *ns* is a dict containing a namespace to execute the function
        in, which may itself contain additional functions.
-       
-       Blocks until all results are in.
-
-       *config* must be a dict including:
-
-            `host`: the hostname to submit grid engine jobs to [required]
-
-            `ssh_port`: the ssh port to connect on
-                        (default: 22)
-
-            `ssh_user`: the ssh username to use
-                        (default: current username)
-
-            `ssh_keyfile`: The path to the passphraseless SSH key to use.
-                           (default: any acceptable key loaded in an SSH
-                            agent, or .ssh/id_rsa, or .ssh/id_dsa)
-
-            `ssh_dir`: the remote directory to put job scripts in,
-                       relative to home directory if a relative path is given
-                       (default .sheepdog)
-
-            `dbfile`: the filename for the results db
-                      (default ./sheepdog.sqlite)
-
-            `port`: the port for the server to listen on
-                    (default: None, a random high-numbered available port)
-
-            `ge_opts`: a list of grid engine options
-                       (default: ["-wd $HOME/.sheepdog/",
-                                  "-o $HOME/.sheepdog/",
-                                  "-e $HOME/.sheepdog/"])
-
-            `shell`: the path to the python to run the job with
-                     (default: "/usr/bin/python")
-
-            `localhost`: the hostname for workers to find the local host
-                         (default: system's FQDN)
     """
     if not ns:
         ns = {}
@@ -118,20 +88,53 @@ def map_sync(f, args, config, ns=None):
     jf = job_file(url, password, request_id, n_args,
                   conf['shell'], conf['ge_opts'])
 
-    print("Deploying job with request ID {0}...".format(request_id))
-
     deployer = Deployer(
         conf['host'], conf['ssh_port'], conf['ssh_user'], conf['ssh_keyfile'])
     deployer.deploy(jf, request_id, conf['ssh_dir'])
     deployer.submit(request_id, conf['ssh_dir'])
 
+    return request_id
+
+def get_results(request_id, block=True, verbose=False):
+    """Fetch results for *request_id*. If *block* is true, wait until all the
+    results are in. Otherwise, return just what has been received so far.
+
+    If *verbose* is true, print a status message every second with the current
+    number of results.
+
+    Returns a list of (arg, result) tuples.
+    """
+    n_args = storage.count_tasks(request_id)
     n_results = 0
-    while n_results != n_args:
+    while True:
         n_results = storage.count_results(request_id)
-        sys.stdout.write("Received {0}/{1} results...\r".format(
-            n_results, n_args))
-        sys.stdout.flush()
+        if verbose:
+            print("{}/{} results\r".format(n_results, n_args), flush=True)
+        if block:
+            break
         time.sleep(1)
 
-    return [serialisation.deserialise_pickle(r[1])
-            for r in storage.get_results(request_id)]
+    results = []
+    for result in storage.get_results(request_id):
+        results.append((
+            serialisation.deserialise_pickle(r[0]),
+            serialisation.deserialise_pickle(r[1])))
+
+    return results
+
+def map(f, args, config, ns=None, verbose=True):
+    """Submit *f* with each of *args* on GridEngine, wait until all the results
+       are in, and return them in the same order as *args*.
+       
+       For details on *config*, see the documentation at:
+       http://sheepdog.readthedocs.org/en/latest/configuration.html
+       Or in docs/configuration.rst.
+
+       Optionally *ns* is a dict containing a namespace to execute the function
+       in, which may itself contain additional functions.
+
+       If *verbose* is true, print out how many results are in so-far while
+       waiting.
+    """
+    request_id = map_async(f, args, config, ns)
+    return get_results(request_id, block=True, verbose=True)
