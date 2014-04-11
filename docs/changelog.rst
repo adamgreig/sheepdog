@@ -4,6 +4,12 @@ Changelog
 Version 0.1
 -----------
 
+0.1.11
+^^^^^^
+
+* Keep track of what servers are running to prevent duplicates being started
+* Allow specification of pickle and marshal protocol versions
+
 0.1.10
 ^^^^^^
 Released on 2014-04-04.

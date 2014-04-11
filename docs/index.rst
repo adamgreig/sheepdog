@@ -16,6 +16,7 @@ Contents:
    quickstart
    configuration
    ssh
+   tips_and_tricks
    changelog
    code/modules
 

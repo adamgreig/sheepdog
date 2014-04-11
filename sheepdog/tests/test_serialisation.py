@@ -3,6 +3,7 @@
 #
 # Released under the MIT license. See LICENSE file for details.
 
+import base64
 from nose.tools import assert_equal, assert_true
 
 from sheepdog import serialisation
@@ -72,3 +73,15 @@ class TestSerialisation:
         assert_true(all(type(item) == bytes for item in s))
         ds = serialisation.deserialise_args(s)
         assert_equal(ds, args)
+
+    def test_changes_pickle_version(self):
+        s = serialisation.serialise_pickle((1, 2, 3))
+        assert (serialisation.pickle_protocol == 
+                serialisation.pickle.DEFAULT_PROTOCOL)
+        p = base64.b64decode(s)
+        assert p[1] == serialisation.pickle_protocol
+
+        serialisation.pickle_protocol = 2
+        s = serialisation.serialise_pickle((1, 2, 3))
+        p = base64.b64decode(s)
+        assert p[1] == 2

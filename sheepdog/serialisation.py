@@ -18,6 +18,13 @@ import base64
 import pickle
 import marshal
 
+# The protocols used for encoding may be changed by changing these variables.
+# Set pickle_protocol to 2 for compatibility between py2 and py3, and set
+# marshal_version to 2 for compatibility between py3.4 and py3.3. Etc.
+pickle_protocol = pickle.DEFAULT_PROTOCOL
+marshal_version = marshal.version
+
+
 def serialise_function(f):
     """Turn a Python function (unbound, no closures, etc) into a base64 byte
        string (a bytes object).
@@ -26,7 +33,7 @@ def serialise_function(f):
         fcode = f.__code__
     else:
         fcode = f.func_code
-    fcodebin = marshal.dumps(fcode, 2)
+    fcodebin = marshal.dumps(fcode, marshal_version)
     return base64.b64encode(fcodebin)
 
 def deserialise_function(f, namespace=None):
@@ -44,7 +51,7 @@ def deserialise_function(f, namespace=None):
 def serialise_pickle(args):
     """Serialise *args* using pickle and base64, returning the b64 bytestring.
     """
-    return base64.b64encode(pickle.dumps(args))
+    return base64.b64encode(pickle.dumps(args, pickle_protocol))
 
 def deserialise_pickle(args):
     """Deserialise *args* using base64 and pickle, returning the Python object.
