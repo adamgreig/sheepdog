@@ -8,7 +8,7 @@ import json
 import time
 import base64
 import tempfile
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_raises
 
 # The lengths I'll go to to avoid having any dependencies in the client code.
 try:
@@ -148,3 +148,18 @@ class TestServer:
                     continue
         if tries == 30:
             raise RuntimeError("Could not connect to server after 30 tries.")
+
+    def test_keeps_global_servers(self):
+        port1 = server._get_free_port()
+        server1 = server.get_server(port1, self.password, self.dbfile)
+        server2 = server.get_server(port1, self.password, self.dbfile)
+        assert server1 is server2
+        port2 = server._get_free_port()
+        server3 = server.get_server(port2, self.password, self.dbfile)
+        assert server3 is not server1
+        with assert_raises(RuntimeError):
+            server.get_server(port2, self.password, self.dbfile + "_")
+        with assert_raises(RuntimeError):
+            server.get_server(port2, self.password + "_", self.dbfile + "_")
+        with assert_raises(RuntimeError):
+            server.get_server(port2, self.password + "_", self.dbfile)

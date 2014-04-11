@@ -12,6 +12,7 @@ debug web server.
 """
 
 import json
+import atexit
 import socket
 from functools import wraps
 from multiprocessing import Process
@@ -137,6 +138,9 @@ def run_server(port, password, dbfile):
 
 class Server:
     """Run the HTTP server for workers to request arguments and return results.
+
+       Should be used via get_server(port, password, dbfile) to manage servers
+       running globally.
     """
 
     def __init__(self, port, password, dbfile):
@@ -157,3 +161,39 @@ class Server:
 
     def __del__(self):
         self.stop()
+
+_servers = {}
+def get_server(port, password, dbfile):
+    """Either start a new server or retrieve a reference to an existing server.
+       Only one server may run per port. If the server currently running on
+       that port has a different password or dbfile, a RuntimeError is raised.
+
+       If `None` is specified for port, a port is picked randomly and that
+       server is the one referenced for `None` thereafter.
+    """
+    global _servers
+    if port not in _servers:
+        server = Server(port, password, dbfile)
+        _servers[port] = server
+
+        # When port is None, this adds another entry for the server on the port
+        # it's actually running on
+        _servers[server.port] = server
+    else:
+        server = _servers[port]
+        if server.password != password or server.dbfile != dbfile:
+            raise RuntimeError("A server is already running on that port with "
+                               "a different password or dbfile.")
+    return server
+
+def _cleanup_servers():
+    """Shut down all running servers in _servers"""
+    global _servers
+    for port in _servers:
+        _servers[port].stop()
+    del _servers
+
+# The servers will continue in their subprocess without going out of scope
+# if we hold a reference in _servers, so register a handler to get rid of
+# them when this process ends.
+atexit.register(_cleanup_servers)
