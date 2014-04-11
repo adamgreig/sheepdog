@@ -30,7 +30,7 @@ import socket
 import random
 import getpass
 
-from sheepdog.server import Server
+from sheepdog.server import get_server
 from sheepdog.storage import Storage
 from sheepdog.deployment import Deployer
 from sheepdog.job_file import job_file
@@ -110,7 +110,7 @@ def map_sync(f, args, config, ns=None):
 
     password = ''.join(random.choice(string.ascii_letters) for _ in range(30))
 
-    server = Server(conf['port'], password, conf['dbfile'])
+    server = get_server(conf['port'], password, conf['dbfile'])
     port = server.port
     url = "http://{0}:{1}/".format(conf['localhost'], port)
 

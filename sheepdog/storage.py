@@ -54,8 +54,11 @@ class Storage:
     def __init__(self, dbfile):
         """__init__ creates a database connection.
 
-        dbfile is a file path for the sqlite file, or `:memory:` to only
-        use in memory persistence.
+        dbfile is a file path for the sqlite file.
+
+        Use of ":memory:" is not advised as the web server runs in a separate
+        process so will not share memory with the main interpreter process,
+        making it rather difficult to retrieve results.
         """
         self.dbfile = dbfile
         self.conn = sqlite3.connect(dbfile)
