@@ -93,13 +93,13 @@ Then,
     args = [(1, 1), (1, 2), (2, 2)]
     config = {"host": "fear"}
 
-    results = sheepdog.map_sync(f, args, config)
+    results = sheepdog.map(f, args, config)
     print("Received results:", results)
     # Received results: [2, 3, 4]
 ```
 
 There is also support for transferring other functions and variables (using the
-namespace parameter `ns` of map_sync) and imports can be handled using
+namespace parameter `ns` of map) and imports can be handled using
 `global`, for example:
 
 ```python
@@ -115,7 +115,7 @@ namespace parameter `ns` of map_sync) and imports can be handled using
     namespace = {"g": g}
     config = {"host": "fear"}
 
-    results = sheepdog.map_sync(f, args, config, namespace)
+    results = sheepdog.map(f, args, config, namespace)
 ```
 
 See the documentation for full details.
