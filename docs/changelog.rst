@@ -6,6 +6,13 @@ Version 0.2
 
 Starting to become stable and useful.
 
+0.2.1
+^^^^^
+Released on 2014-07-10
+
+* Documentation updates
+* Remove redundant console output
+
 0.2.0
 ^^^^^
 Released on 2014-04-11
