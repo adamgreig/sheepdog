@@ -110,13 +110,15 @@ def get_results(request_id, dbfile, block=True, verbose=False):
     storage = Storage(dbfile=dbfile)
     n_args = storage.count_tasks(request_id)
     n_results = 0
+    last_n_results = None
     while True:
         n_results = storage.count_results(request_id)
         n_errors = storage.count_errors(request_id)
-        if verbose:
+        if verbose and n_results != last_n_results:
             print("{}/{} results, {} errors\r".format(
                   n_results, n_args, n_errors))
             sys.stdout.flush()
+        last_n_results = n_results
         if not block or n_results + n_errors == n_args:
             break
         time.sleep(1)
