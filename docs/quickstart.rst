@@ -48,7 +48,7 @@ In the simplest case you have some function ``f(x1, x2, ...)`` and you wish to
 run it with many arguments, ``[(a1, a2, ...), (b1, b2, ...), ...]`` and get
 back the results, ``[f(a1, a2, ...), f(b1, b2, ...), ...]``. If the results are
 likely to come in quickly and/or you just want to wait for them, use
-:py:func:`sheepdog.map_sync`.
+:py:func:`sheepdog.map`.
 
 Here's what it looks like:
 
@@ -60,15 +60,25 @@ Here's what it looks like:
     ...
     >>> args = [(1, 1), (1, 2), (2, 2)]
     >>> conf = {"host": "fear", "ge_opts": ["-l ubuntu=1", "-l lr=0"]}
-    >>> sheepdog.map_sync(f, args, conf)
+    >>> sheepdog.map(f, args, conf)
     [2, 3, 4]
+
+Asynchronous Map
+----------------
+
+Much like :py:func:`sheepdog.map`, :py:func:`sheepdog.map_async` runs ``f``
+with each set of arguments in ``args`` using the provided configuration and
+optional namespace. Unlike :py:func:`sheepdog.map`,
+:py:func:`sheepdog.map_async` returns a request ID immediately after
+deployment, and it is then up to the user to poll for status, for example using
+:py:func:`sheepdog.get_results`.
 
 Namespaces
 ----------
 
 Often the target function will require other items be present in its namespace,
 for instance constants or other functions. These may be passed in the namespace
-parameter `ns` of map_sync:
+parameter `ns` of map:
 
 .. code-block:: python
 
@@ -106,3 +116,14 @@ For example:
     ...     global np
     ...     return g(x)
     ...
+
+
+Results and Errors
+------------------
+
+To fetch results out of the database after a request, see
+:py:func:`sheepdog.get_results`. Similarly for errors that may have occured
+during the job (those that Python was able to catch and recover from), you can
+use :py:func:`sheepdog.get_errors`. If errors were detected and verbose mode is
+on, you will also be prompted to check the errors after calling
+:py:func:`sheepdog.map`.
