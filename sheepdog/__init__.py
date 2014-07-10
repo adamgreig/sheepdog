@@ -161,7 +161,7 @@ def map(f, args, config, ns=None, verbose=True):
     results = get_results(request_id, conf['dbfile'], block=True, verbose=True)
     storage = Storage(dbfile=conf['dbfile'])
 
-    if storage.count_errors(request_id) != 0:
+    if verbose and storage.count_errors(request_id) != 0:
         print("Some errors occured, view them with get_errors({}, '{}')"
               .format(request_id, conf['dbfile']), file=sys.stderr)
 
