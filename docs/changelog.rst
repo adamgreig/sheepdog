@@ -6,6 +6,14 @@ Version 0.2
 
 Starting to become stable and useful.
 
+0.2.2
+^^^^^
+Released on 2014-10-27
+
+* Fix a bug where multiple runs in the same Python session would break
+* Count errors properly in verbose map mode
+* Automatically call setrlimit when a mem_grab resource specifier is given
+
 0.2.1
 ^^^^^
 Released on 2014-07-10
