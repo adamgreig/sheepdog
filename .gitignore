@@ -1,6 +1,7 @@
 venv/
 venv*/
 dist/
+build/
 Sheepdog.egg-info
 MANIFEST
 __pycache__

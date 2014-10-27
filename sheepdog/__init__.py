@@ -53,6 +53,9 @@ default_config = {
 }
 
 
+session_password = None
+
+
 def map_async(f, args, config, ns=None):
     """Submit *f* with each of *args* on GridEngine, returning the
        (sheepdog-local) request ID.
@@ -64,6 +67,7 @@ def map_async(f, args, config, ns=None):
        Optionally *ns* is a dict containing a namespace to execute the function
        in, which may itself contain additional functions.
     """
+    global session_password
     if not ns:
         ns = {}
 
@@ -78,14 +82,16 @@ def map_async(f, args, config, ns=None):
     storage.initdb()
     request_id = storage.new_request(func_bin, namespace_bin, args_bin)
 
-    password = ''.join(random.choice(string.ascii_letters) for _ in range(30))
+    if not session_password:
+        session_password = ''.join(random.choice(string.ascii_letters)
+                                   for _ in range(30))
 
-    server = get_server(conf['port'], password, conf['dbfile'])
+    server = get_server(conf['port'], session_password, conf['dbfile'])
     port = server.port
     url = "http://{0}:{1}/".format(conf['localhost'], port)
 
     n_args = len(args)
-    jf = job_file(url, password, request_id, n_args,
+    jf = job_file(url, session_password, request_id, n_args,
                   conf['shell'], conf['ge_opts'])
 
     deployer = Deployer(
@@ -110,15 +116,15 @@ def get_results(request_id, dbfile, block=True, verbose=False):
     storage = Storage(dbfile=dbfile)
     n_args = storage.count_tasks(request_id)
     n_results = 0
-    last_n_results = None
+    last_count = None
     while True:
         n_results = storage.count_results(request_id)
         n_errors = storage.count_errors(request_id)
-        if verbose and n_results != last_n_results:
+        if verbose and n_results + n_errors != last_count:
             print("{}/{} results, {} errors\r".format(
                   n_results, n_args, n_errors))
             sys.stdout.flush()
-        last_n_results = n_results
+        last_count = n_results + n_errors
         if not block or n_results + n_errors == n_args:
             break
         time.sleep(1)
@@ -155,6 +161,8 @@ def map(f, args, config, ns=None, verbose=True):
        waiting.
     """
     request_id = map_async(f, args, config, ns)
+    if verbose:
+        print("Deployed with request ID", request_id)
 
     conf = copy.copy(default_config)
     conf.update(config)
