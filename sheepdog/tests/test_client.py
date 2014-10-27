@@ -8,6 +8,11 @@ import socket
 import tempfile
 from nose.tools import assert_equal, assert_raises, assert_true
 
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
+
 from sheepdog import storage, server, serialisation, client
 
 def get_free_port():
@@ -93,7 +98,7 @@ class TestClient:
         self.client.submit_results()
         expected = serialisation.serialise_pickle(self.func(*self.args[1]))
         assert_equal(self.storage.get_results(self.request_id),
-            [(self.args_bin[1], expected)])
+                     [(self.args_bin[1], expected)])
 
     def test_submit_exceeds_retries(self):
         self.client.get_details()
@@ -111,13 +116,13 @@ class TestClient:
         self.client.run()
         self.client._submit_error("oops")
         assert_equal(self.storage.get_errors(self.request_id),
-            [(self.args_bin[1], "oops")])
+                     [(self.args_bin[1], "oops")])
 
     def test_go_wrapper(self):
         self.client.go()
         expected = serialisation.serialise_pickle(self.func(*self.args[1]))
         assert_equal(self.storage.get_results(self.request_id),
-            [(self.args_bin[1], expected)])
+                     [(self.args_bin[1], expected)])
 
     def test_catches_exceptions(self):
         def bad_function(a, b):
@@ -133,3 +138,29 @@ class TestClient:
 
         assert_true("MyOwnException: oopsie!" in
                     self.storage.get_errors(request_id)[0][1])
+
+    memlimit_tests = {
+        '123': 123, '3k': 3*1024, '5K': 5*1024,
+        '2M': 2*1024*1024, '2000m': 2000*1024*1024,
+        '1g': 1024*1024*1024, '8g': 8*1024*1024*1024,
+        '3t': 3*1024*1024*1024*1024, '1T': 1024*1024*1024*1024}
+
+    @patch('resource.setrlimit')
+    def check_sets_memlimit(self, k, v, setrlimit):
+        with tempfile.NamedTemporaryFile('w+') as f:
+            f.write("#!/usr/bin/python\n#$ -l mem_grab={}\nprint('hello')\n"
+                    .format(k))
+            f.flush()
+            self.client.set_memlimit(f.name)
+        setrlimit.assert_called_with(
+            client.resource.RLIMIT_AS, (v, v))
+
+    def test_sets_memlimit(self):
+        for key, value in self.memlimit_tests.items():
+            self.check_sets_memlimit(key, value)
+
+    def test_calls_memlimit(self):
+        self.client.set_memlimit = Mock()
+        self.client.get_details()
+        self.client.run()
+        assert self.client.set_memlimit.called

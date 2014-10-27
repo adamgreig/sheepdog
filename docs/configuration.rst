@@ -86,5 +86,9 @@ Note that ``-S /path/to/shell`` is always specified by the ``shell`` option
 detailed above, and ``-t 1-N`` is always specified with N equal to the number
 of arguments being evaluated.
 
+If the resource specification ``-l mem_grab=2G`` (2G for example) is present,
+the sheepdog client will automatically call ``resource.setrlimit`` to restrict
+the process to that amount of memory.
+
 All these options are written to the top of the job file which is copied to the
 GridEngine server, so may be inspected manually too.

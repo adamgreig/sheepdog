@@ -11,9 +11,11 @@ only used by pasting it into a job file (as workers don't generally have
 sheepdog itself installed).
 """
 
+import re
 import time
 import json
 import base64
+import resource
 import traceback
 
 try:
@@ -32,6 +34,7 @@ except NameError:
                                         deserialise_namespace,
                                         serialise_pickle)
 
+
 class Client:
     """Find out what to do, do it, report back."""
     HTTP_RETRIES = 10
@@ -45,6 +48,19 @@ class Client:
         userpass = ("sheepdog:" + self.password).encode()
         authstr = "Basic " + base64.b64encode(userpass).decode()
         self.authhdr = {"Authorization": authstr}
+
+    def set_memlimit(self, fname=__file__):
+        with open(fname) as f:
+            contents = f.read()
+            match = re.search(r"^#\$ -l mem_grab=([0-9]+)([kmgtKMGT]?)$",
+                              contents, re.MULTILINE)
+        if match:
+            units = match.group(2).upper()
+            scale = {'K': 1024, 'M': 1024*1024, 'G': 1024*1024*1024,
+                     'T': 1024*1024*1024*1024, '': 1}[units]
+            limit = int(match.group(1)) * scale
+            print("Setting RLIMIT_AS to {}".format(limit))
+            resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
 
     def get_details(self):
         """Retrieve the function to run and arguments to run with from the
@@ -65,7 +81,7 @@ class Client:
                 continue
         if tries == self.HTTP_RETRIES:
             raise RuntimeError("Could not connect to server.")
-       
+
         result = json.loads(response.read().decode())
         self.args = deserialise_arg(result['args'])
         self.ns = deserialise_namespace(result['ns'])
@@ -76,6 +92,7 @@ class Client:
         if not hasattr(self, 'func') or not hasattr(self, 'args'):
             raise RuntimeError("Must call `get_details` before `run`.")
         try:
+            self.set_memlimit()
             self.result = self.func(*self.args)
             print(self.result)
         except:
@@ -98,7 +115,7 @@ class Client:
         tries = 0
         while tries < self.HTTP_RETRIES:
             try:
-                response = urlopen(req)
+                urlopen(req)
                 break
             except URLError:
                 tries += 1
