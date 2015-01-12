@@ -19,7 +19,7 @@ Sheepdog is released under the MIT license, see the LICENSE file for details.
 from __future__ import print_function
 
 __author__ = "Adam Greig <adam@adamgreig.com>"
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])
 __license__ = "MIT License"
 

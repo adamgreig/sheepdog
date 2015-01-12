@@ -6,6 +6,13 @@ Version 0.2
 
 Starting to become stable and useful.
 
+0.2.3
+^^^^^
+Released on 2015-01-12
+
+* Use a 30 second timeout on sqlite3 (instead of default 5s) to help work
+  around https://github.com/adamgreig/sheepdog/issues/28
+
 0.2.2
 ^^^^^
 Released on 2014-10-27
