@@ -61,7 +61,7 @@ class Storage:
         making it rather difficult to retrieve results.
         """
         self.dbfile = dbfile
-        self.conn = sqlite3.connect(dbfile)
+        self.conn = sqlite3.connect(dbfile, timeout=30.0)
 
     def initdb(self):
         """Create the database structure if it doesn't already exist.
