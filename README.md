@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/adamgreig/sheepdog.png?branch=master)](https://travis-ci.org/adamgreig/sheepdog)
 [![Coverage Status](https://coveralls.io/repos/adamgreig/sheepdog/badge.png?branch=master)](https://coveralls.io/r/adamgreig/sheepdog?branch=master)
-[![PyPi Version](https://pypip.in/v/Sheepdog/badge.png)](https://pypi.python.org/pypi/Sheepdog/)
-[![License](https://pypip.in/license/Sheepdog/badge.png)](https://pypi.python.org/pypi/Sheepdog/)
+[![PyPi Version](https://img.shields.io/pypi/v/Sheepdog.svg)](https://pypi.python.org/pypi/Sheepdog/)
+[![License](https://img.shields.io/pypi/l/Sheepdog.svg)](https://pypi.python.org/pypi/Sheepdog/)
 
 Make Grid Engine a bit more useful from Python.
 
